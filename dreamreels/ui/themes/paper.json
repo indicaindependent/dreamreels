@@ -1,0 +1,4 @@
+{"name":"paper","label":"Paper Matinee","mood":"Warm cream, riso-poster print",
+ "bg":"#F4EAD6","surface":"#FFFDF7","surface2":"#EADFC8","text":"#1C1917","muted":"#6B5F52","accent":"#B91C1C","accent2":"#1D4ED8",
+ "focus":"#B91C1C","focusInner":"#FFFDF7","danger":"#B91C1C","ok":"#15803D",
+ "fontDisplay":"Fraunces","fontBody":"IBM Plex Sans","radius":6,"focusScale":1.05,"glow":false,"heroGradient":false}

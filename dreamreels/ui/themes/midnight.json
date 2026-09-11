@@ -1,0 +1,4 @@
+{"name":"midnight","label":"Midnight Cinema","mood":"Dark, cinematic, glass-on-black",
+ "bg":"#0B0F17","surface":"#151B26","surface2":"#1E2633","text":"#F5F7FA","muted":"#9AA3B2","accent":"#E11D48","accent2":"#60A5FA",
+ "focus":"#60A5FA","focusInner":"#0B0F17","danger":"#F87171","ok":"#34D399",
+ "fontDisplay":"Outfit","fontBody":"Inter","radius":14,"focusScale":1.08,"glow":true,"heroGradient":true}
