@@ -1,0 +1,347 @@
+{
+ "bundle": "dreamreels-v2.0.0a1-20260911",
+ "files": [
+  {
+   "path": ".gitignore",
+   "bytes": 67,
+   "md5": "4629a6f423aa3de2dce0c382cb03d918"
+  },
+  {
+   "path": "LICENSE",
+   "bytes": 1081,
+   "md5": "10d7ef81445d165d89031fc5d99ab199"
+  },
+  {
+   "path": "README.md",
+   "bytes": 4846,
+   "md5": "7c471805b3a7f0bde18a8ca2ffef5049"
+  },
+  {
+   "path": "bin/dreamreels-apply",
+   "bytes": 48,
+   "md5": "7109929dd82f8b6b805966361825a144"
+  },
+  {
+   "path": "docs/ARCHITECTURE.md",
+   "bytes": 1292,
+   "md5": "fa42bea0521786c870b527abb21efe01"
+  },
+  {
+   "path": "docs/FORKING.md",
+   "bytes": 1771,
+   "md5": "36103b4fc6081d33ff06898a8b316085"
+  },
+  {
+   "path": "dreamreels/__init__.py",
+   "bytes": 206,
+   "md5": "4ec482f408f41900fa629da1bc092dde"
+  },
+  {
+   "path": "dreamreels/__main__.py",
+   "bytes": 3127,
+   "md5": "d5f0ad43db84d271fedfceb953416c7d"
+  },
+  {
+   "path": "dreamreels/apply.py",
+   "bytes": 15969,
+   "md5": "0437fba6e4c2c956ab53c1a703a74f71"
+  },
+  {
+   "path": "dreamreels/badge/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/badge/iim.py",
+   "bytes": 2581,
+   "md5": "174e2ff58edd271a1f25c1c44062ab87"
+  },
+  {
+   "path": "dreamreels/core/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/core/config.py",
+   "bytes": 2414,
+   "md5": "0d4b0a5c7a1f4cefb9a72df816670c90"
+  },
+  {
+   "path": "dreamreels/core/db.py",
+   "bytes": 3471,
+   "md5": "793b878a1bc0e6212199e4cb16bf964d"
+  },
+  {
+   "path": "dreamreels/core/ids.py",
+   "bytes": 578,
+   "md5": "9039095c77b42b6bd64ed307cd4b0904"
+  },
+  {
+   "path": "dreamreels/core/log.py",
+   "bytes": 607,
+   "md5": "67b07aecb59e03f2cbc086da2b256622"
+  },
+  {
+   "path": "dreamreels/core/paths.py",
+   "bytes": 1025,
+   "md5": "2159aaf81f2d3344d219efceeb924d59"
+  },
+  {
+   "path": "dreamreels/core/tools.py",
+   "bytes": 1262,
+   "md5": "29db9bdfc2e7cc0160c2adfdd107c68f"
+  },
+  {
+   "path": "dreamreels/doctor.py",
+   "bytes": 4540,
+   "md5": "9c692b6b67c7c503d9ae96471269a2f7"
+  },
+  {
+   "path": "dreamreels/dreamy/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/dreamy/agent.py",
+   "bytes": 13508,
+   "md5": "d199ddee9f640a7c688baf8a31010082"
+  },
+  {
+   "path": "dreamreels/dreamy/backend.py",
+   "bytes": 3733,
+   "md5": "68666357a9e7b0850a4d7b3245271bc3"
+  },
+  {
+   "path": "dreamreels/dreamy/mascot.py",
+   "bytes": 4680,
+   "md5": "abd22999e660d1ebd3c2d531ca045dd3"
+  },
+  {
+   "path": "dreamreels/grower.py",
+   "bytes": 6289,
+   "md5": "bbd74649e40e0ecb89570dc16c908e80"
+  },
+  {
+   "path": "dreamreels/mapping/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/metadata/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/metadata/tmdb.py",
+   "bytes": 5035,
+   "md5": "f6e99f7f3ede870d36da44c8b12e4b5a"
+  },
+  {
+   "path": "dreamreels/migrate/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/migrate/from_v1.py",
+   "bytes": 3658,
+   "md5": "fd36702b7f6ccbb0ca16d144d018af52"
+  },
+  {
+   "path": "dreamreels/player/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/player/backend.py",
+   "bytes": 10641,
+   "md5": "860d1d760179c826a8e63f07f582ca6a"
+  },
+  {
+   "path": "dreamreels/player/gamepad.py",
+   "bytes": 4122,
+   "md5": "008d09aaf44cf1338192f0a245291617"
+  },
+  {
+   "path": "dreamreels/player/models.py",
+   "bytes": 947,
+   "md5": "67d0af778c29b4308767ad5ccff0a80e"
+  },
+  {
+   "path": "dreamreels/player/mpv_widget.py",
+   "bytes": 2863,
+   "md5": "79812d52c47c8d22fd26733a2bd530a9"
+  },
+  {
+   "path": "dreamreels/player/run.py",
+   "bytes": 4383,
+   "md5": "0ae59b28631e5f64bc8989188a94e8c7"
+  },
+  {
+   "path": "dreamreels/sources/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/sources/archive_org.py",
+   "bytes": 7322,
+   "md5": "a47b5095ee09e7924f4b4089a111ca4c"
+  },
+  {
+   "path": "dreamreels/sources/nas_discovery.py",
+   "bytes": 2946,
+   "md5": "82ffa8fd37d5c76442676dccb8dd5d6e"
+  },
+  {
+   "path": "dreamreels/system/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/ui/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/ui/qml/Main.qml",
+   "bytes": 11709,
+   "md5": "7f1a201dafaaa4f39b2cbd33e3a90b7f"
+  },
+  {
+   "path": "dreamreels/ui/qml/Wizard.qml",
+   "bytes": 16824,
+   "md5": "179a677630c91f1598982f9228cc209b"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/BadgeCorner.qml",
+   "bytes": 1341,
+   "md5": "d50adc76d1c34da7811f23e56580bb18"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/BigToggleCard.qml",
+   "bytes": 1525,
+   "md5": "5cb0baf1a25717fc11d5ede417edaf56"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/Chip.qml",
+   "bytes": 981,
+   "md5": "e891e91be3f6b67895b2762db307210d"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/DetailPane.qml",
+   "bytes": 3091,
+   "md5": "27b58e6b3431217c66bbf8260a711933"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/DreamyPanel.qml",
+   "bytes": 6089,
+   "md5": "dd6609e69ea980f023b186c7c9a5aa65"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/FocusFrame.qml",
+   "bytes": 805,
+   "md5": "525e6551e72672a70beea3afe0b53478"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/Hero.qml",
+   "bytes": 1544,
+   "md5": "17c2f8081243d3fac76ae6df7256a4a7"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/Icon.qml",
+   "bytes": 341,
+   "md5": "4e1cedbe2ce660482fe022e47b875473"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/Icons.js",
+   "bytes": 2988,
+   "md5": "d071be9787dd5d666bc1dd98dd012b67"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/PlayerOverlay.qml",
+   "bytes": 1888,
+   "md5": "d67814910ec66116447ba9091ee2344e"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/PosterCard.qml",
+   "bytes": 2439,
+   "md5": "a46ff0663334ccde714032ce1ffdd26a"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/Rail.qml",
+   "bytes": 1353,
+   "md5": "f136c9e7a79023a3d4c7650635fac33e"
+  },
+  {
+   "path": "dreamreels/ui/qml/components/SourceButton.qml",
+   "bytes": 1272,
+   "md5": "5096758d2d91edc2de63bda1f3248767"
+  },
+  {
+   "path": "dreamreels/ui/theme.py",
+   "bytes": 3213,
+   "md5": "510cc7995a80732c7a1d93355c7c9315"
+  },
+  {
+   "path": "dreamreels/ui/themes/midnight.json",
+   "bytes": 402,
+   "md5": "fc73a3d48d10c9fdd3c1210990e47047"
+  },
+  {
+   "path": "dreamreels/ui/themes/neon.json",
+   "bytes": 401,
+   "md5": "e0b556fc2bd362fb93d8b877c26637cc"
+  },
+  {
+   "path": "dreamreels/ui/themes/paper.json",
+   "bytes": 406,
+   "md5": "68249ec1f8808173d1d45cdca62b1ea4"
+  },
+  {
+   "path": "dreamreels/wizard/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "dreamreels/wizard/backend.py",
+   "bytes": 12216,
+   "md5": "319dd451210d92e5232bf468cdd54c45"
+  },
+  {
+   "path": "dreamreels/wizard/run.py",
+   "bytes": 2782,
+   "md5": "9610dcf50a36479b18f18103e42b4db5"
+  },
+  {
+   "path": "install.sh",
+   "bytes": 796,
+   "md5": "becf7dcbc80a60d23243e1984d567561"
+  },
+  {
+   "path": "pyproject.toml",
+   "bytes": 707,
+   "md5": "24d1cafbe8fbfa412378c85d204ceda4"
+  },
+  {
+   "path": "tests/__init__.py",
+   "bytes": 0,
+   "md5": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  {
+   "path": "tests/test_agent_and_sources.py",
+   "bytes": 1914,
+   "md5": "266d5d0d2fe03b869099a65b4bc4efb7"
+  },
+  {
+   "path": "tests/test_core.py",
+   "bytes": 1355,
+   "md5": "bb254befee34d0cec71496c6f58ba6e4"
+  },
+  {
+   "path": "tools/seed_demo.py",
+   "bytes": 5383,
+   "md5": "e7f8d60ae030e2abd8de6309658f5124"
+  }
+ ],
+ "file_count": 68,
+ "total_bytes": 198777
+}

@@ -1,0 +1,4 @@
+{"name":"neon","label":"Neon Arcade","mood":"Retro-synth, magenta and cyan",
+ "bg":"#0A0714","surface":"#160F2B","surface2":"#221743","text":"#F4F0FF","muted":"#A79BC8","accent":"#FF007F","accent2":"#00E5FF",
+ "focus":"#FF007F","focusInner":"#0A0714","danger":"#FF4D6D","ok":"#39FF88",
+ "fontDisplay":"Space Grotesk","fontBody":"Manrope","radius":10,"focusScale":1.10,"glow":true,"heroGradient":true}
