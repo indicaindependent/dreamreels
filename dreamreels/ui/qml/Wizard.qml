@@ -42,10 +42,10 @@ Window {
     Row { anchors.right: parent.right; anchors.rightMargin: ui.safe + 300 * ui.s; anchors.bottom: parent.bottom; anchors.bottomMargin: 60 * ui.s; spacing: 18 * ui.s
         SourceButton { visible: wiz.index > 0 && wiz.stepId !== "done"; label: "Back"; icon: "back"; onClicked: wiz.back() }
         SourceButton { visible: wiz.stepId !== "summary" && wiz.stepId !== "done"; label: wiz.stepId === "welcome" ? "Let's go" : "Next"; icon: "play"; current: true; onClicked: wiz.next() }
-        SourceButton { visible: wiz.stepId === "summary"; label: "Build"; icon: "check"; current: true; onClicked: wiz.writePlan() }
-        SourceButton { visible: wiz.stepId === "done"; label: "Close"; icon: "check"; current: true; onClicked: Qt.quit() }
+        SourceButton { visible: wiz.stepId === "summary"; label: "Build"; icon: "check"; current: true; onClicked: wiz.build() }
+        SourceButton { visible: wiz.stepId === "done" && !wiz.building; label: wiz.built ? "Open DreamReels" : "Close"; icon: "check"; current: true; onClicked: Qt.quit() }
     }
-    Item { anchors.fill: parent; focus: true; Keys.onPressed: (e) => { if (e.key === Qt.Key_Escape && !app.kiosk) Qt.quit(); else if (e.key === Qt.Key_Right || e.key === Qt.Key_Return) { if (wiz.stepId === "summary") wiz.writePlan(); else wiz.next() } else if (e.key === Qt.Key_Left || e.key === Qt.Key_Backspace) wiz.back(); else return; e.accepted = true } }
+    Item { anchors.fill: parent; focus: true; Keys.onPressed: (e) => { if (e.key === Qt.Key_Escape && !app.kiosk) Qt.quit(); else if (e.key === Qt.Key_Right || e.key === Qt.Key_Return) { if (wiz.stepId === "summary") wiz.build(); else if (wiz.stepId === "done") { if (!wiz.building) Qt.quit() } else wiz.next() } else if (e.key === Qt.Key_Left || e.key === Qt.Key_Backspace) wiz.back(); else return; e.accepted = true } }
 
     // ---- step bodies ----
     Component { id: welcome; Column { spacing: 22 * ui.s
@@ -111,7 +111,10 @@ Window {
         Repeater { model: wiz.summaryLines
             Row { spacing: 20 * ui.s; Text { width: 220 * ui.s; text: modelData.k; color: theme.muted; font.family: theme.fontBody; font.weight: Font.Bold; font.pixelSize: 24 * ui.s }
                   Text { width: right.width - 240 * ui.s; text: modelData.v; color: theme.text; wrapMode: Text.WordWrap; font.family: theme.fontBody; font.pixelSize: 24 * ui.s } } } } }
-    Component { id: done; Column { spacing: 18 * ui.s; width: parent.width
-        Text { width: parent.width; text: "Your choices are saved. The system part (user, mounts, autologin, service) runs as root:"; color: theme.text; wrapMode: Text.WordWrap; font.family: theme.fontBody; font.pixelSize: 28 * ui.s }
-        Rectangle { width: parent.width; height: 70 * ui.s; radius: theme.radius; color: theme.surface2; Text { anchors.centerIn: parent; text: "sudo dreamreels-apply"; color: theme.accent2; font.family: "DejaVu Sans Mono"; font.pixelSize: 28 * ui.s } } } }
+    Component { id: done; Column { spacing: 14 * ui.s; width: parent.width
+        Rectangle { width: parent.width; height: 420 * ui.s; radius: theme.radius; color: theme.surface2; clip: true
+            ListView { id: blog; anchors.fill: parent; anchors.margins: 16 * ui.s; model: wiz.buildLines; spacing: 6 * ui.s; onCountChanged: positionViewAtEnd()
+                delegate: Text { width: blog.width; text: modelData; wrapMode: Text.WrapAnywhere; font.family: "DejaVu Sans Mono"; font.pixelSize: 21 * ui.s
+                    color: modelData.indexOf("FAIL") === 0 ? "#ff6b6b" : modelData.indexOf("OK") === 0 ? theme.accent2 : theme.text } } }
+        Text { width: parent.width; text: wiz.building ? "Working..." : (wiz.built ? "All set. The player is running - press Open DreamReels." : (wiz.buildLines.length ? "Something needs a hand - the FAIL line says what." : "")); color: theme.muted; wrapMode: Text.WordWrap; font.family: theme.fontBody; font.pixelSize: 24 * ui.s } } }
 }

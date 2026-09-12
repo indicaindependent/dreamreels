@@ -26,11 +26,11 @@ STEPS = [  # id, title, Dreamy pose, Dreamy line
     ("skin", "Choose a look", "celebrate", "Three skins. Pick the one that feels like your living room."),
     ("user", "System user", "think", "I'll create a 'dreamreels' user that logs in automatically and starts the player. A password is optional."),
     ("summary", "Ready to build", "point", "Here's everything I'm about to do. Nothing has changed yet. Press Build when you're happy."),
-    ("done", "All set", "celebrate", "Setup is written. Run 'sudo dreamreels-apply' to finish the system part, or press Build to do it now."),
+    ("done", "Building", "celebrate", "I am setting everything up. Each line below is something I checked on this machine."),
 ]
 
 class WizardBackend(QObject):
-    changed = Signal(); nasChanged = Signal(); toast = Signal(str)
+    changed = Signal(); nasChanged = Signal(); toast = Signal(str); buildChanged = Signal()
     def __init__(self, cfg: dict):
         super().__init__(); ensure_dirs(); self.cfg = cfg; self._i = 0
         self.sel = {"publicdomain": True, "chan83": False, "toontown": False, "nas": False, "youtube": False}
@@ -40,7 +40,7 @@ class WizardBackend(QObject):
         self.handles = list(cfg["youtube"].get("channels") or []); self.tmdb = cfg["tmdb"].get("read_token", "")
         self.theme = cfg["meta"].get("theme", "midnight"); self.username = "dreamreels"; self.password = ""
         self.nas_hosts: list[dict] = []; self.nas_picked: set[str] = set(); self.nas_scanning = False
-        self._mascot_cache = {}
+        self._mascot_cache = {}; self._build_lines: list[str] = []; self._building = False; self._built = False
     # ---- steps ----
     def _active_steps(self):
         out = []
@@ -180,3 +180,23 @@ class WizardBackend(QObject):
         if self.password:
             pw = PLAN_FILE.with_name("plan.secret"); pw.write_text(self.password); os.chmod(pw, 0o600)
         self.toast.emit(f"Wrote {PLAN_FILE}"); self._i = len(self._active_steps()) - 1; self.changed.emit(); return True
+    # ---- build ----
+    @Property("QVariantList", notify=buildChanged)
+    def buildLines(self): return list(self._build_lines)
+    @Property(bool, notify=buildChanged)
+    def building(self): return self._building
+    @Property(bool, notify=buildChanged)
+    def built(self): return self._built
+    @Slot()
+    def build(self):
+        if self._building: return
+        self.writePlan(); self._building = True; self._build_lines = []; self.buildChanged.emit()
+        def log(line): self._build_lines.append(str(line)); self.buildChanged.emit()
+        def work():
+            try:
+                from .build import run_build
+                res = run_build(cfgmod.load(), log=log, launch_player=True); self._built = res["ok"]
+                log("Done. DreamReels is starting." if res["ok"] else "Finished with problems - see the lines marked FAIL.")
+            except Exception as e: log(f"FAIL build crashed: {e}")
+            self._building = False; self.buildChanged.emit()
+        threading.Thread(target=work, daemon=True).start()

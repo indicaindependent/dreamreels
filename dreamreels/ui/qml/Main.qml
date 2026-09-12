@@ -41,9 +41,9 @@ Window {
         var b = topButtons[i]; topIdx = i
         if (b.id === "home") { backend.loadHome(); zone = "rails"; railIdx = 0; colIdx = 0 }
         else if (b.id === "dreamy") dreamyPanel.open = true
-        else if (b.id === "search") toast("Search arrives in P3")
-        else if (b.id === "settings") toast("Settings arrives in P5")
-        else toast(b.label + " lane: browse view arrives in P3")
+        else if (b.id === "search") { dreamyPanel.open = true; toast("Type what you are looking for - Dreamy searches the library") }
+        else if (b.id === "settings") toast("Settings: run 'python3 -m dreamreels wizard' to change sources or skin")
+        else { backend.loadLane(b.id); zone = "rails"; railIdx = 0; colIdx = 0 }
     }
     function toast(t) { toastText = t; toastTimer.restart() }
     Timer { id: toastTimer; interval: 2200; onTriggered: toastText = "" }
@@ -73,7 +73,7 @@ Window {
         if (zone === "rails") { var it = heroItem(); if (it.uid) { backend.openDetail(it.uid); detailBtn = 0; zone = "detail" } return }
         if (zone === "detail") {
             var d = backend.detail
-            if (detailBtn === 0) { if (d.verified) { backend.closeDetail(); zone = "rails"; backend.play(d.uid, false) } else toast("Not verified yet - the finder arrives in P3") }
+            if (detailBtn === 0) { if (d.verified) { backend.closeDetail(); zone = "rails"; backend.play(d.uid, false) } else backend.verifyNow(d.uid) }
             else if (detailBtn === 1) { backend.closeDetail(); zone = "rails"; backend.play(d.uid, true) }
             else if (detailBtn === 2) backend.toggleFavorite(d.uid)
             else { var d = backend.detail; dreamyPanel.open = true; if (d && d.title) dreamyPanel.send("tell me about \"" + d.title + "\"") }

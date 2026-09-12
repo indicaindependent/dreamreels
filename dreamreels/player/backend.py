@@ -69,6 +69,45 @@ class Backend(QObject):
             its = self._items("SELECT * FROM items WHERE decade=? AND blocked=0 AND kind='movie' ORDER BY downloads DESC, added DESC LIMIT 30", (dec,))
             if its: rails.append({"id": f"decade:{dec}", "label": f"{dec}s", "model": self._model(f"decade:{dec}", its)})
         self._rails = rails; self.railsChanged.emit()
+    @Slot(str)
+    def loadLane(self, lane):
+        """One lane, deep: rails grouped the way that lane is naturally browsed. Uses the same rail UI as Home."""
+        rails = []
+        def add(rid, label, its):
+            if its: rails.append({"id": rid, "label": label, "model": self._model(rid, its)})
+        if lane == "pd":
+            add("pd:verified", "Ready to play", self._items("SELECT * FROM items WHERE source='pd' AND verified=1 AND blocked=0 ORDER BY added DESC LIMIT 40"))
+            for dec, in self._q("SELECT DISTINCT decade FROM items WHERE source='pd' AND decade IS NOT NULL AND blocked=0 ORDER BY decade"):
+                add(f"decade:{dec}", f"{dec}s", self._items("SELECT * FROM items WHERE source='pd' AND decade=? AND blocked=0 ORDER BY downloads DESC, title LIMIT 60", (dec,)))
+            for g in ("Film-Noir", "Horror", "Sci-Fi", "Comedy", "Drama", "Western", "Mystery", "Thriller", "Romance", "Adventure", "Crime", "Documentary"):
+                add(f"genre:{g}", g, self._items("SELECT * FROM items WHERE source='pd' AND genres LIKE ? AND blocked=0 ORDER BY downloads DESC, title LIMIT 60", (f"%{g}%",)))
+        elif lane in ("chan83", "toontown"):
+            for uid, title, years in self._q("SELECT uid,title,years FROM shows WHERE source=? ORDER BY title", (lane,)):
+                add(f"show:{uid}", f"{title}" + (f"  {years}" if years else ""), self._items("SELECT * FROM items WHERE show_uid=? AND blocked=0 ORDER BY season, episode, title", (uid,)))
+        elif lane == "nas":
+            for kind, label in (("movie", "Movies"), ("episode", "TV"), ("video", "Videos"), ("track", "Music")):
+                add(f"nas:{kind}", label, self._items("SELECT * FROM items WHERE source='nas' AND kind=? AND blocked=0 ORDER BY title LIMIT 200", (kind,)))
+            add("nas:recent", "Recently added", self._items("SELECT * FROM items WHERE source='nas' AND blocked=0 ORDER BY added DESC LIMIT 40"))
+        elif lane == "youtube":
+            add("yt:latest", "Latest", self._items("SELECT * FROM items WHERE source='youtube' AND blocked=0 ORDER BY added DESC LIMIT 60"))
+            for ch, in self._q("SELECT DISTINCT director FROM items WHERE source='youtube' AND director IS NOT NULL AND director!='' ORDER BY director"):
+                add(f"yt:{ch}", ch, self._items("SELECT * FROM items WHERE source='youtube' AND director=? AND blocked=0 ORDER BY added DESC LIMIT 60", (ch,)))
+        elif lane == "music":
+            add("music:all", "All tracks", self._items("SELECT * FROM items WHERE (source='music' OR kind='track') AND blocked=0 ORDER BY title LIMIT 300"))
+        if not rails: rails.append({"id": f"{lane}:empty", "label": {"pd": "Public Domain", "chan83": "Channel 83", "toontown": "Toon Town", "nas": "NAS", "youtube": "YouTube", "music": "Music"}.get(lane, lane) + " - nothing here yet", "model": self._model("empty", [])})
+        self._rails = rails; self.railsChanged.emit()
+    @Slot(str)
+    def verifyNow(self, uid):
+        """Decode-verify one title on demand (detail page 'Check' button); reopens the detail with the result."""
+        import threading
+        def work():
+            from .. import grower
+            c = dbmod.connect()
+            try: res = grower._verify_one(c, uid); c.commit()
+            except Exception as e: res = f"error {e}"
+            finally: c.close()
+            self.toast.emit("Plays" if res == "verified" else f"Could not verify ({res})"); self.openDetail(uid)
+        self.toast.emit("Checking that this really plays..."); threading.Thread(target=work, daemon=True).start()
     @Property("QVariantList", notify=railsChanged)
     def rails(self): return [{"id": r["id"], "label": r["label"]} for r in self._rails]
     @Slot(int, result=QObject)

@@ -6,7 +6,7 @@ from pathlib import Path
 def main(cfg: dict, argv=None) -> int:
     ap = argparse.ArgumentParser(prog="dreamreels player")
     ap.add_argument("--screenshot"); ap.add_argument("--after", type=int, default=1500); ap.add_argument("--size", default="1920x1080")
-    ap.add_argument("--theme"); ap.add_argument("--windowed", action="store_true"); ap.add_argument("--no-video", action="store_true"); ap.add_argument("--zone", default="rails"); ap.add_argument("--dreamy", default="")
+    ap.add_argument("--theme"); ap.add_argument("--windowed", action="store_true"); ap.add_argument("--no-video", action="store_true"); ap.add_argument("--zone", default="rails"); ap.add_argument("--lane", default=""); ap.add_argument("--dreamy", default="")
     a, _ = ap.parse_known_args(argv)
     shot = bool(a.screenshot)
     if shot:
@@ -70,6 +70,7 @@ def main(cfg: dict, argv=None) -> int:
     if shot:
         w, h = (int(x) for x in a.size.lower().split("x")); win.setWidth(w); win.setHeight(h)
         win.setProperty("zone", a.zone)
+        if a.lane: backend.loadLane(a.lane); win.setProperty("topIdx", ["home","pd","chan83","toontown","nas","youtube","music"].index(a.lane) if a.lane in ("pd","chan83","toontown","nas","youtube","music") else 0)
         def grab():
             img = win.grabWindow(); ok = img.save(a.screenshot); print(("saved " if ok else "FAILED ") + a.screenshot, img.width(), img.height()); app.exit(0 if ok else 3)
         QTimer.singleShot(a.after, grab)

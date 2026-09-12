@@ -52,9 +52,24 @@ def _map_one(c, cfg, uid):
     if not c.execute("SELECT 1 FROM jobs WHERE kind='verify' AND payload=? AND status IN ('pending','running','done')", (json.dumps({"uid": uid}),)).fetchone(): _job(c, "verify", {"uid": uid})
     return "mapped" if hit else "unmapped"
 
+def _cache_art(c, row):
+    """Pull a seeded item's remote TMDB still into the local poster cache so the player never depends on the image CDN at draw time."""
+    try:
+        p = row["poster"] or ""
+        if row["poster_local"] or "/t/p/" not in p: return
+        path = "/" + p.split("/t/p/", 1)[1].split("/", 1)[1]
+        loc = TMDB.image(path, "w500")
+        if loc: c.execute("UPDATE items SET poster_local=? WHERE uid=?", (loc, row["uid"]))
+    except Exception as e: log.info("art cache skipped %s: %s", row["uid"], e)
+
 def _verify_one(c, uid):
     row = c.execute("SELECT * FROM items WHERE uid=?", (uid,)).fetchone()
     if not row or not row["ia_id"]: return "gone"
+    if row["ia_file"] and row["stream_url"]:  # pre-mapped lanes name the exact file: decode THAT first, fall back to the item's other files
+        ok, note, dur = ia.verify_decode(row["stream_url"])
+        if ok:
+            c.execute("UPDATE items SET verified=1,verified_at=?,verify_note=?,runtime_min=COALESCE(runtime_min,?) WHERE uid=?", (time.time(), f"mapped-file {note}", int(dur // 60) if dur else None, uid))
+            _cache_art(c, row); return "verified"
     meta = ia.ia_meta(row["ia_id"]); cands = [x for x in ia.candidates(meta, row["ia_id"]) if not x["part"]][:4]
     md = meta.get("metadata") or {}
     if row["strict_pd"] == 0 and ia.strict_pd(md, row["year"]): c.execute("UPDATE items SET strict_pd=1 WHERE uid=?", (uid,))
@@ -69,7 +84,13 @@ def _verify_one(c, uid):
 def work(cfg: dict, limit: int = 20) -> dict:
     c = dbmod.connect(); done = {}
     try:
-        rows = c.execute("SELECT * FROM jobs WHERE status='pending' AND not_before<=? ORDER BY id LIMIT ?", (time.time(), limit)).fetchall()
+        # a job left 'running' by a killed grower is orphaned after 15 min: give it back
+        c.execute("UPDATE jobs SET status='pending',updated=? WHERE status='running' AND updated<?", (time.time(), time.time() - 900)); c.commit()
+        # verified titles still drawing from the remote image CDN: pull their art local, a few per pass
+        for r in c.execute("SELECT * FROM items WHERE verified=1 AND poster_local IS NULL AND poster LIKE '%/t/p/%' LIMIT 25").fetchall(): _cache_art(c, r)
+        c.commit()
+        # verifies first (they are what makes a title playable), then maps, oldest first within each
+        rows = c.execute("SELECT * FROM jobs WHERE status='pending' AND not_before<=? ORDER BY (kind='verify') DESC, id LIMIT ?", (time.time(), limit)).fetchall()
         for j in rows:
             c.execute("UPDATE jobs SET status='running',attempts=attempts+1,updated=? WHERE id=?", (time.time(), j["id"])); c.commit()
             try:

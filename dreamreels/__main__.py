@@ -14,6 +14,7 @@ def main(argv=None) -> int:
     sub.add_parser("migrate-db", help="create/upgrade the database")
     b = sub.add_parser("badge", help="write the IIM badge SVG"); b.add_argument("out")
     sub.add_parser("config", help="print effective config")
+    sub.add_parser("build", help="run the Build step from a terminal (same code the wizard runs)")
     g = sub.add_parser("grow", help="run the library grower"); g.add_argument("--discover", action="store_true"); g.add_argument("--work", type=int, default=0); g.add_argument("--limit", type=int, default=40); g.add_argument("--status", action="store_true")
     m = sub.add_parser("import-v1", help="import a DreamReel v1 library"); m.add_argument("--db", default="/opt/dreamreel/dreamreel.db")
     v = sub.add_parser("verify-url", help="decode-proof one URL"); v.add_argument("url")
@@ -26,6 +27,8 @@ def main(argv=None) -> int:
     if a.cmd == "badge":
         from .badge.iim import badge_svg
         open(a.out, "w").write(badge_svg()); print(a.out); return 0
+    if a.cmd == "build":
+        from .wizard.build import run_build; cfg = cfgmod.load(); r = run_build(cfg, log=print, launch_player=not getattr(a, "no_player", False)); return 0 if r["ok"] else 2
     if a.cmd == "grow":
         from . import grower; cfg = cfgmod.load(); db.migrate()
         if a.discover: print("seeded", grower.discover(cfg, a.limit))
