@@ -1,9 +1,9 @@
 {
- "bundle": "dreamreels-v2.0.0a2-20260912.tar.gz",
- "bundle_md5": "637cd14ddf313e7bb217e7d77407da6f",
+ "bundle": "dreamreels-v2.0.0a3-20260912.tar.gz",
+ "bundle_md5": "181ea1c9fd51af7b0e470835a80a92ae",
  "generated_by": "regenerated from the published tree at publication time",
- "file_count": 72,
- "total_bytes": 680674,
+ "file_count": 75,
+ "total_bytes": 726836,
  "files": {
   ".gitignore": {
    "bytes": 67,
@@ -37,13 +37,13 @@
   },
   "dreamreels/__init__.py": {
    "bytes": 206,
-   "sha256": "83907c055bee76d6fb84c6e5135ab60881972f932f09fc989c00b044bc313909",
-   "md5": "4ec482f408f41900fa629da1bc092dde"
+   "sha256": "8e65df53716d3685dde0838267041b1227794b3d4061d1d3925183a51f2a18be",
+   "md5": "52c37841566ce85f9284f8d3b45b0739"
   },
   "dreamreels/__main__.py": {
-   "bytes": 3425,
-   "sha256": "98c6e67fcdd1295265b554f95090b589a5b360d4e934a0d247c8d70544c122a5",
-   "md5": "a8f680cbfc7bbcb5832695f805eb73c9"
+   "bytes": 3652,
+   "sha256": "097c5f08aa84543f46c41c1215e6d0529d50c43c1728eace1cd500e2ec92135b",
+   "md5": "721933406a4fea0795ec451bd3cedb32"
   },
   "dreamreels/apply.py": {
    "bytes": 15969,
@@ -81,9 +81,9 @@
    "md5": "9039095c77b42b6bd64ed307cd4b0904"
   },
   "dreamreels/core/log.py": {
-   "bytes": 607,
-   "sha256": "c42a2cd9b8317f200666242bb0dd3714fedcb998b1f9c4973f28fb59131a9c3b",
-   "md5": "67b07aecb59e03f2cbc086da2b256622"
+   "bytes": 626,
+   "sha256": "429630f38e3377036103b37b6857ac7b6a2b465de74d9307487c3ed3e225d43d",
+   "md5": "aa6093c41406c8491a26bf836cd722a2"
   },
   "dreamreels/core/paths.py": {
    "bytes": 1025,
@@ -146,9 +146,9 @@
    "md5": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "dreamreels/metadata/tmdb.py": {
-   "bytes": 6741,
-   "sha256": "5e4c1f5f8e59db474358f987bc83605ced32c1f381ddabcc21f45b8ebbad2142",
-   "md5": "fc7ed1d488a0a876a3e5487c34e2a06d"
+   "bytes": 6742,
+   "sha256": "247dbdfdca5edbef46b4097980b1d0330c6a0bf04f8ce6e093cbd141f4e11bca",
+   "md5": "950e1833086114d9b263df5e71bcb54c"
   },
   "dreamreels/migrate/__init__.py": {
    "bytes": 0,
@@ -166,9 +166,9 @@
    "md5": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "dreamreels/player/backend.py": {
-   "bytes": 14227,
-   "sha256": "ab0d8bc39ae3ede453412d0b41e43ff350c885ae2684f3abf6093a0e1b0255c8",
-   "md5": "92904c97476fa19873c7c6a25f1f1137"
+   "bytes": 15682,
+   "sha256": "eafe4221fcf2cf1b59e10cb6955a4792ec227d2b913f85dcc3a765965fa7865c",
+   "md5": "4ff3fb8e3344249ef32e84a3990e4cc2"
   },
   "dreamreels/player/gamepad.py": {
    "bytes": 4122,
@@ -176,19 +176,24 @@
    "md5": "008d09aaf44cf1338192f0a245291617"
   },
   "dreamreels/player/models.py": {
-   "bytes": 947,
-   "sha256": "dfe82f48759ed9211cc9a0f13a7323c6da3bc7bdce62c4dd8977fc8285d74764",
-   "md5": "67d0af778c29b4308767ad5ccff0a80e"
+   "bytes": 1484,
+   "sha256": "88ccbfa14a95a2a3c5d3130e362f51238bbedac0fe112568732345b6c7a7b326",
+   "md5": "a002a2403996469d91b55a697c79352c"
   },
   "dreamreels/player/mpv_widget.py": {
-   "bytes": 2863,
-   "sha256": "eea12d22d56c609637b9d4d74706f3d5be40cbd300e8b5e8159704a932d085c0",
-   "md5": "79812d52c47c8d22fd26733a2bd530a9"
+   "bytes": 5612,
+   "sha256": "1f3d6bd26fc0324393fb61dcbd58371a2363d2cf52ff3a9af3020100e95ce1a4",
+   "md5": "8fb223e3ec89851d94f21727f00fe4c8"
+  },
+  "dreamreels/player/observe.py": {
+   "bytes": 20329,
+   "sha256": "7750a03bd34943d113d6479618e8f396bc5eb19f44a1ab8272a28fc0c5c1658f",
+   "md5": "389e06f5ac80985f324acd24b821a869"
   },
   "dreamreels/player/run.py": {
-   "bytes": 4637,
-   "sha256": "075dd81bd92f807e4d279abdc3dd1484cf8e46115626926cc6875c7e7775ed67",
-   "md5": "4c6852dc19a78b4a1a060c73bc7f16be"
+   "bytes": 7154,
+   "sha256": "8bde6767e485ce776244d2c9f62b43ea49a613ce7270a6d196c11fb3e43c2686",
+   "md5": "3e9e34cbdc22aeec103e1de1ae0aa7f7"
   },
   "dreamreels/sources/__init__.py": {
    "bytes": 0,
@@ -221,9 +226,9 @@
    "md5": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "dreamreels/ui/qml/Main.qml": {
-   "bytes": 11813,
-   "sha256": "e2ca60b1e4d8cd32fa641c76fc1ea33a0cc03aef81d60fd6c3306c4297e4abac",
-   "md5": "ee60479d43283ffcb5e1716beb6e303a"
+   "bytes": 12041,
+   "sha256": "a756564df38b004ad005579e43eaf2ac4dc974ef1bb79232ebcf622d20427b57",
+   "md5": "210d1dc2be7cdc8244bceff0a6d76e62"
   },
   "dreamreels/ui/qml/Wizard.qml": {
    "bytes": 17346,
@@ -336,9 +341,9 @@
    "md5": "9610dcf50a36479b18f18103e42b4db5"
   },
   "install.sh": {
-   "bytes": 1231,
-   "sha256": "b3ee9de2277da1ed8e207fe8fcdca450fd79c02e40f2e7c084c414f7265cb50f",
-   "md5": "2411aaa925b54941896f811cd89af819"
+   "bytes": 1387,
+   "sha256": "8844bf1a62a3bdc456065103e95909b47bdd5731472c4b42cce2a7ba6a264819",
+   "md5": "8ad086b4222317066b76c4fb129a9285"
   },
   "pyproject.toml": {
    "bytes": 707,
@@ -359,6 +364,16 @@
    "bytes": 1355,
    "sha256": "5a0c7e136464aa214ab899794e378214eb7120927031973f39d7e23965ba350f",
    "md5": "bb254befee34d0cec71496c6f58ba6e4"
+  },
+  "tools/qa_drive.py": {
+   "bytes": 12033,
+   "sha256": "01df10b989db87fcc8ce1ecc7cf31b4e58979ab92ab1cf8eeec95bb46c163ca7",
+   "md5": "02babe1a08e7a2d0232c37b79003942e"
+  },
+  "tools/reset_Dreamreels.py": {
+   "bytes": 5911,
+   "sha256": "7c60fa59257b2b9f5bdd2f401f627f8ea46e941fe61e73289394d9640acc4eea",
+   "md5": "0c104dc9b496a2399bf8a3d6b85d53e9"
   },
   "tools/seed_demo.py": {
    "bytes": 5383,

@@ -50,6 +50,9 @@ def main(argv=None) -> int:
     if a.cmd == "wizard" or (a.cmd is None and not cfg["meta"]["setup_complete"]):
         from .wizard import run as wizard_run
         return wizard_run.main(cfg, rest)
+    if a.cmd == "player" and not cfg["meta"]["setup_complete"]:  # kiosk unit after a reset: show the wizard, not a half-configured player
+        from .wizard import run as wizard_run
+        return wizard_run.main(cfg, rest)
     from .player import run as player_run
     return player_run.main(cfg, rest)
 

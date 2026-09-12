@@ -72,10 +72,11 @@ Window {
         if (zone === "top") { activateTop(topIdx); return }
         if (zone === "rails") { var it = heroItem(); if (it.uid) { backend.openDetail(it.uid); detailBtn = 0; zone = "detail" } return }
         if (zone === "detail") {
-            var d = backend.detail
-            if (detailBtn === 0) { if (d.verified) { backend.closeDetail(); zone = "rails"; backend.play(d.uid, false) } else backend.verifyNow(d.uid) }
-            else if (detailBtn === 1) { backend.closeDetail(); zone = "rails"; backend.play(d.uid, true) }
-            else if (detailBtn === 2) backend.toggleFavorite(d.uid)
+            var d = backend.detail; var uid = "" + ((d && d.uid) || ""); var ok = !!(d && d.verified)   // copy FIRST: closeDetail() blanks backend.detail and d tracks it live -> play("") = "Not found"
+            if (uid === "") { backend.toastMsg("Nothing selected"); return }
+            if (detailBtn === 0) { if (ok) { backend.play(uid, false); backend.closeDetail(); zone = "rails" } else backend.verifyNow(uid) }
+            else if (detailBtn === 1) { backend.play(uid, true); backend.closeDetail(); zone = "rails" }
+            else if (detailBtn === 2) backend.toggleFavorite(uid)
             else { var d = backend.detail; dreamyPanel.open = true; if (d && d.title) dreamyPanel.send("tell me about \"" + d.title + "\"") }
         }
     }

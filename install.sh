@@ -11,4 +11,5 @@ echo "[2/4] python venv"; [ -d .venv ] || python3 -m venv .venv --system-site-pa
 echo "[3/4] doctor"; python -m dreamreels doctor || true
 echo "[3b/4] passwordless sudo for the root half of setup (only this one command)"
 printf '%s ALL=(root) NOPASSWD: %s/bin/dreamreels-apply *\n' "$USER" "$(pwd)" | sudo tee /etc/sudoers.d/dreamreels >/dev/null; sudo chmod 440 /etc/sudoers.d/dreamreels; sudo visudo -cf /etc/sudoers.d/dreamreels >/dev/null || { sudo rm -f /etc/sudoers.d/dreamreels; echo "sudoers entry rejected - Build will ask you to run dreamreels-apply yourself"; }
+install -m 755 tools/reset_Dreamreels.py "$HOME/reset_Dreamreels.py" 2>/dev/null || true   # re-run the wizard any time: sudo python3 ~/reset_Dreamreels.py
 echo "[4/4] setup"; python -m dreamreels migrate-db; python -m dreamreels wizard

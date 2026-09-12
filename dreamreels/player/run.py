@@ -2,6 +2,7 @@
 from __future__ import annotations
 import argparse, os, sys, tempfile
 from pathlib import Path
+from .. import __version__
 
 def main(cfg: dict, argv=None) -> int:
     ap = argparse.ArgumentParser(prog="dreamreels player")
@@ -22,6 +23,16 @@ def main(cfg: dict, argv=None) -> int:
     from .backend import Backend
     from .gamepad import GamepadBridge
     ensure_dirs()
+    import logging
+    from ..core.log import setup as _logsetup
+    plog = _logsetup("dreamreels.player") if not shot else logging.getLogger("dreamreels.player")
+    from PySide6.QtCore import qInstallMessageHandler, QtMsgType
+    def _qt_msg(mode, ctx, msg):  # QML warnings (TypeError, Insufficient arguments, failed imports) land in player.log instead of vanishing
+        lvl = logging.ERROR if mode in (QtMsgType.QtCriticalMsg, QtMsgType.QtFatalMsg) else logging.WARNING if mode == QtMsgType.QtWarningMsg else logging.INFO
+        if "qt.qml.delegatemodel" in msg or "qt.qml.gc" in msg: return
+        plog.log(lvl, "Qt: %s", msg)
+    qInstallMessageHandler(_qt_msg)
+    plog.info("player boot: platform=%s video=%s windowed=%s argv=%s", os.environ.get("QT_QPA_PLATFORM"), not shot and not a.no_video, a.windowed, sys.argv[1:])
     app = QGuiApplication(sys.argv[:1])
     for f in (ASSETS / "fonts").glob("*.ttf"): QFontDatabase.addApplicationFont(str(f))
     video_enabled = not shot and not a.no_video
@@ -55,7 +66,8 @@ def main(cfg: dict, argv=None) -> int:
     def get_mpv():
         if "m" not in mpv_holder:
             root = engine.rootObjects()[0]; obj = root.findChild(QObject, "mpv")
-            mpv_holder["m"] = obj.mpv if obj is not None else None
+            mpv_holder["m"] = getattr(obj, "mpv", None) if obj is not None else None
+            plog.info("mpv lookup: object=%s mpv=%s", obj is not None, mpv_holder["m"] is not None)
         return mpv_holder["m"]
     backend = Backend(cfg, get_mpv)
     appobj = App()
@@ -67,6 +79,15 @@ def main(cfg: dict, argv=None) -> int:
     if not engine.rootObjects():
         print("QML failed to load", file=sys.stderr); return 2
     win = engine.rootObjects()[0]
+    if not shot and not os.environ.get("DREAMREELS_NO_OBSERVE"):
+        from .observe import Observatory
+        from ..core.paths import LOG_DIR
+        try:
+            ocfg = cfg.get("observe", {}) if isinstance(cfg.get("observe"), dict) else {}
+            engine._obs = Observatory(app, win, backend, cfg, LOG_DIR / "player.log", __version__, host=ocfg.get("host", "0.0.0.0"), port=int(ocfg.get("port", 8474)))
+            engine._obs.start()
+        except Exception as e:
+            plog.error("observatory failed to start: %r", e)
     if shot:
         w, h = (int(x) for x in a.size.lower().split("x")); win.setWidth(w); win.setHeight(h)
         win.setProperty("zone", a.zone)
@@ -74,6 +95,20 @@ def main(cfg: dict, argv=None) -> int:
         def grab():
             img = win.grabWindow(); ok = img.save(a.screenshot); print(("saved " if ok else "FAILED ") + a.screenshot, img.width(), img.height()); app.exit(0 if ok else 3)
         QTimer.singleShot(a.after, grab)
+    probe = os.environ.get("DREAMREELS_PLAY_PROBE")  # diagnostic: DREAMREELS_PLAY_PROBE=<uid> plays that title 2 s after boot, reports at 12 s, exits
+    if probe:
+        import time as _time
+        rep = {"toasts": [], "t0": _time.time()}
+        backend.toast.connect(lambda m: rep["toasts"].append(m))
+        def _go(): print(f"PROBE play({probe}) at +{_time.time()-rep['t0']:.1f}s", flush=True); backend.play(probe, False)
+        def _report():
+            m = backend._player()
+            def g(n):
+                try: return getattr(m, n)
+                except Exception as e: return f"ERR {e}"
+            print(f"PROBE playing={backend.playing} mpv={'None' if m is None else 'ok'} time_pos={g('time_pos') if m else None} duration={g('duration') if m else None} "
+                  f"video={g('video_format') if m else None} paused={g('pause') if m else None} toasts={rep['toasts']}", flush=True); app.exit(0)
+        QTimer.singleShot(2000, _go); QTimer.singleShot(12000, _report)
     rc = app.exec()
     del engine  # tear the QML tree down before the Python context objects die
     return rc
