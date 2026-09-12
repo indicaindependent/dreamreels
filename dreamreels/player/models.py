@@ -4,8 +4,15 @@ from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt
 ROLES = ["uid","title","year","poster","backdrop","blurb","source","kind","verified","progress","subtitle","badge"]
 
 class ItemModel(QAbstractListModel):
-    def __init__(self, items: list[dict] | None = None):
-        super().__init__(); self._items = items or []
+    def __init__(self, items: list[dict] | None = None, parent=None):
+        # ALWAYS parented: a parentless QObject handed to QML through a result=QObject slot gets JavaScript
+        # ownership and is deleted on the next JS garbage collection while Python still holds the wrapper ->
+        # "libshiboken: Internal C++ object (ItemModel) already deleted" after a few lane switches (QA drive, Sep 12).
+        super().__init__(parent); self._items = items or []
+        try:
+            from PySide6.QtQml import QQmlEngine
+            QQmlEngine.setObjectOwnership(self, QQmlEngine.ObjectOwnership.CppOwnership)
+        except Exception: pass
     def rowCount(self, parent=QModelIndex()): return len(self._items)
     def data(self, index, role):
         if not index.isValid(): return None

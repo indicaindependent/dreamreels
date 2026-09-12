@@ -3,6 +3,8 @@ Playback truth: `playing` flips only after mpv reports a video/audio track and f
 from __future__ import annotations
 import json, os, sqlite3, threading, time
 from PySide6.QtCore import QObject, Signal, Slot, Property, QTimer
+import logging, time
+log = logging.getLogger("dreamreels.player")
 from ..core import db as dbmod
 from ..core.paths import POSTER_CACHE
 from .models import ItemModel
@@ -33,6 +35,8 @@ class Backend(QObject):
         self._rails: list[dict] = []; self._models: dict[str, ItemModel] = {}
         self._playing = False; self._pos = 0.0; self._dur = 0.0; self._paused = False; self._cur_uid = None
         self._detail = {}
+        self.toasts = []  # observatory: last 30 toasts with timestamps
+        self.toast.connect(lambda m: (self.toasts.append((time.time(), m)), self.toasts.__delitem__(slice(0, max(0, len(self.toasts) - 30))), log.info("toast: %s", m)))
         self._t = QTimer(self); self._t.setInterval(1000); self._t.timeout.connect(self._tick)
         self.loadHome()
     # ---------- data ----------
@@ -51,7 +55,7 @@ class Backend(QObject):
         return out
     def _model(self, key, items):
         m = self._models.get(key)
-        if m is None: m = ItemModel(items); self._models[key] = m
+        if m is None: m = ItemModel(items, parent=self); self._models[key] = m
         else: m.setItems(items)
         return m
     @Slot()
@@ -142,14 +146,19 @@ class Backend(QObject):
         if self._mpv is None and self._mpv_getter: self._mpv = self._mpv_getter()
         return self._mpv
     @Slot(str)
+    def toastMsg(self, m): self.toast.emit(m)
+    @Slot(str)
     @Slot(str, bool)
-    def play(self, uid, resume=True):  # QML calls play(uid) with one arg; without the 1-arg overload Qt logs 'Insufficient arguments' and the Play button is dead
+    def play(self, uid, resume=True):
+        if not uid: log.warning("play(): EMPTY uid from QML"); self.toast.emit("Nothing selected"); return  # QML calls play(uid) with one arg; without the 1-arg overload Qt logs 'Insufficient arguments' and the Play button is dead
         r = self._q("SELECT * FROM items WHERE uid=?", (uid,))
-        if not r: self.toast.emit("Not found"); return
+        if not r: log.warning("play(%s): not found", uid); self.toast.emit("Not found"); return
         row = r[0]; url = row["path"] or row["stream_url"]
-        if not url: self.toast.emit("No playable source yet - ask Dreamy to find one"); return
+        if not url: log.warning("play(%s): no path/stream_url", uid); self.toast.emit("No playable source yet - ask Dreamy to find one"); return
         m = self._player()
-        if m is None: self.toast.emit("Player unavailable"); return
+        if m is None: log.error("play(%s): mpv object not found in the QML scene", uid); self.toast.emit("Player unavailable"); return
+        log.info("play(%s) resume=%s url=%s", uid, resume, url[:120])
+        self._started_at = time.time(); self._first_frame = False
         start = 0.0
         if resume:
             st = self._q("SELECT resume_sec,duration_sec FROM state WHERE uid=?", (uid,))
@@ -159,7 +168,7 @@ class Backend(QObject):
             try:
                 m.play(url)
                 if start > 5: m.wait_for_property("duration", lambda v: v is not None, timeout=20); m.seek(start, reference="absolute")
-            except Exception as e: self.toast.emit(f"Playback failed: {e}")
+            except Exception as e: log.error("play(%s): mpv raised %s", uid, e); self.toast.emit(f"Playback failed: {e}")
         threading.Thread(target=go, daemon=True).start()
         self._playing = True; self.playingChanged.emit(); self.playbackStarted.emit(); self._t.start()
         c = dbmod.connect(); c.execute("INSERT INTO state(uid,last_played,play_count) VALUES(?,?,1) ON CONFLICT(uid) DO UPDATE SET last_played=excluded.last_played, play_count=play_count+1", (uid, time.time())); c.commit(); c.close()
@@ -168,7 +177,11 @@ class Backend(QObject):
         if not m: return
         try:
             p = m.time_pos; d = m.duration; eof = m.eof_reached
-        except Exception: return
+        except Exception as e: log.warning("tick: mpv property read failed: %s", e); return
+        if p is not None and not getattr(self, "_first_frame", False):
+            self._first_frame = True; log.info("playback started: time_pos=%.2f duration=%s video=%s", float(p), d, getattr(m, "video_format", None))
+        if p is None and self._playing and time.time() - getattr(self, "_started_at", time.time()) > 15:  # armed but nothing decoded: say so instead of a silent black screen
+            log.error("playback watchdog: no time-pos after 15 s (uid=%s)", self._cur_uid); self.toast.emit("Playback did not start - see player.log"); self.stop(); return
         if p is not None: self._pos = float(p)
         if d: self._dur = float(d)
         self.positionChanged.emit()

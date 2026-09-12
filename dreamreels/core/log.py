@@ -9,7 +9,7 @@ def setup(name: str = "dreamreels") -> logging.Logger:
         return log
     log.setLevel(logging.INFO)
     fmt = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
-    fh = logging.handlers.RotatingFileHandler(LOG_DIR / f"{name}.log", maxBytes=2_000_000, backupCount=5)
+    fh = logging.handlers.RotatingFileHandler(LOG_DIR / f"{name.rsplit('.', 1)[-1]}.log", maxBytes=2_000_000, backupCount=5)
     fh.setFormatter(fmt); log.addHandler(fh)
     sh = logging.StreamHandler(); sh.setFormatter(fmt); log.addHandler(sh)
     return log

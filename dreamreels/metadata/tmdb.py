@@ -9,8 +9,8 @@ API = "https://api.themoviedb.org/3"; IMG = "https://image.tmdb.org/t/p/"
 UA = f"DreamReels/{__version__} (+{GITHUB_URL})"
 
 def _fetch_image_bytes(url: str, timeout=15) -> bytes | None:
-    """image.tmdb.org is a multi-CDN host; some edges are unreachable from some networks (measured: bunny 185.93.1.x
-    'No route to host' over a VPN egress while 143.244.60.196 served 200). Try the resolver's answer first, then every
+    """image.tmdb.org is a multi-CDN host; some edges are unreachable from some networks (measured: one CDN's
+    edge gave 'No route to host' over a VPN egress while another edge served 200). Try the resolver's answer first, then every
     A record from Google DoH, pinning SNI + Host so the CDN still serves the right site."""
     import http.client, json, socket, ssl
     from urllib.parse import urlparse
