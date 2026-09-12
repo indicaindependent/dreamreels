@@ -8,6 +8,38 @@ from .. import __version__, GITHUB_URL
 API = "https://api.themoviedb.org/3"; IMG = "https://image.tmdb.org/t/p/"
 UA = f"DreamReels/{__version__} (+{GITHUB_URL})"
 
+def _fetch_image_bytes(url: str, timeout=15) -> bytes | None:
+    """image.tmdb.org is a multi-CDN host; some edges are unreachable from some networks (measured: bunny 185.93.1.x
+    'No route to host' over a VPN egress while 143.244.60.196 served 200). Try the resolver's answer first, then every
+    A record from Google DoH, pinning SNI + Host so the CDN still serves the right site."""
+    import http.client, json, socket, ssl
+    from urllib.parse import urlparse
+    u = urlparse(url); host = u.hostname; pathq = u.path + (("?" + u.query) if u.query else "")
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            if r.status == 200: return r.read()
+    except Exception: pass
+    ips = []
+    try:
+        req = urllib.request.Request(f"https://dns.google/resolve?name={host}&type=A", headers={"User-Agent": UA, "Accept": "application/dns-json"})
+        with urllib.request.urlopen(req, timeout=8) as r: ips = [a["data"] for a in json.load(r).get("Answer", []) if a.get("type") == 1]
+    except Exception: pass
+    try: ips += [ai[4][0] for ai in socket.getaddrinfo(host, 443, socket.AF_INET)]
+    except Exception: pass
+    seen = set()
+    for ip in ips:
+        if ip in seen: continue
+        seen.add(ip)
+        try:
+            ctx = ssl.create_default_context(); conn = http.client.HTTPSConnection(ip, 443, timeout=timeout, context=ctx)
+            conn._server_hostname = host  # SNI
+            conn.sock = ctx.wrap_socket(socket.create_connection((ip, 443), timeout=timeout), server_hostname=host)
+            conn.request("GET", pathq, headers={"Host": host, "User-Agent": UA}); r = conn.getresponse(); data = r.read(); conn.close()
+            if r.status == 200 and data: return data
+        except Exception: continue
+    return None
+
 class TMDB:
     def __init__(self, token: str): self.token = token
     def _get(self, path: str, params: dict | None = None, ttl=30 * 86400):
@@ -51,11 +83,8 @@ class TMDB:
         if not path: return None
         POSTER_CACHE.mkdir(parents=True, exist_ok=True); dest = POSTER_CACHE / (hashlib.sha1(f"{size}{path}".encode()).hexdigest()[:16] + ".jpg")
         if dest.exists() and dest.stat().st_size > 1000: return str(dest)
-        try:
-            req = urllib.request.Request(f"{IMG}{size}{path}", headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=20) as r: data = r.read()
-            if len(data) > 1000: dest.write_bytes(data); return str(dest)
-        except Exception: pass
+        data = _fetch_image_bytes(f"{IMG}{size}{path}")
+        if data and len(data) > 1000: dest.write_bytes(data); return str(dest)
         return None
     def enrich(self, m: dict) -> dict:
         """Flatten a movie+credits response into item columns."""
