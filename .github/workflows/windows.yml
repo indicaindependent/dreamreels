@@ -1,0 +1,80 @@
+name: Windows build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write        # attach the exe to the release on tags
+  id-token: write        # build provenance attestation
+  attestations: write
+
+env:
+  # Pinned libmpv for Windows x86_64 (shinchiro/mpv-winbuild-cmake). Bump both lines together.
+  MPV_DEV_URL: https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20261021/mpv-dev-x86_64-20261021-git-e471496c56.7z
+  MPV_DEV_SHA256: efc719eff3dc5954b4a5efc800632808bcec01cc9034940dd14e5eb7fe9ea633
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install DreamReels and PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install . pyinstaller
+
+      - name: Fetch libmpv (hash-checked)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force packaging/windows/vendor | Out-Null
+          Invoke-WebRequest -Uri $env:MPV_DEV_URL -OutFile mpv-dev.7z
+          $h = (Get-FileHash mpv-dev.7z -Algorithm SHA256).Hash.ToLower()
+          if ($h -ne $env:MPV_DEV_SHA256) { throw "libmpv hash mismatch: got $h" }
+          7z e mpv-dev.7z libmpv-2.dll -opackaging/windows/vendor -y
+          if (-not (Test-Path packaging/windows/vendor/libmpv-2.dll)) { throw "libmpv-2.dll not in archive" }
+
+      - name: Build DreamReels.exe
+        run: pyinstaller --noconfirm packaging/windows/DreamReels.spec
+
+      - name: Smoke test
+        shell: pwsh
+        run: |
+          $env:DREAMREELS_SMOKE_OUT = "$PWD\smoke.txt"
+          $p = Start-Process dist/DreamReels.exe -Wait -PassThru
+          Get-Content smoke.txt
+          if ($p.ExitCode -ne 0) { throw "smoke test failed (exit $($p.ExitCode))" }
+
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $h = (Get-FileHash dist/DreamReels.exe -Algorithm SHA256).Hash.ToLower()
+          "$h  DreamReels.exe" | Tee-Object dist/DreamReels.exe.sha256.txt
+          "size $((Get-Item dist/DreamReels.exe).Length) bytes"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DreamReels-windows
+          path: |
+            dist/DreamReels.exe
+            dist/DreamReels.exe.sha256.txt
+
+      - name: Attest build provenance
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/DreamReels.exe
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/DreamReels.exe
+            dist/DreamReels.exe.sha256.txt

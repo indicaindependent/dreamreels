@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls.Basic
 import "components"
+import "components/Icons.js" as Icons
 
 Window {
     id: win
@@ -9,18 +10,21 @@ Window {
     visibility: app.kiosk ? Window.FullScreen : Window.Windowed
     QtObject { id: ui; property real s: Math.min(win.width / 1920, win.height / 1080); property real safe: 0.05 * win.width }
 
-    // top brand row
-    Row { x: ui.safe; y: 26 * ui.s; spacing: 14 * ui.s
-        Icon { name: "reel"; px: 44 * ui.s; color: theme.accent; anchors.verticalCenter: parent.verticalCenter }
-        Text { text: "DreamReels"; color: theme.text; font.family: theme.fontDisplay; font.weight: Font.Bold; font.pixelSize: 40 * ui.s; anchors.verticalCenter: parent.verticalCenter }
-        Rectangle { anchors.verticalCenter: parent.verticalCenter; radius: 8 * ui.s; color: theme.surface2; width: vt.implicitWidth + 18 * ui.s; height: vt.implicitHeight + 8 * ui.s
-            Text { id: vt; anchors.centerIn: parent; text: "v" + app.version; color: theme.muted; font.family: theme.fontBody; font.pixelSize: 20 * ui.s } }
-    }
+    // top brand row (v2.1.0 shared logo)
+    BrandLogo { x: ui.safe; y: 26 * ui.s; s: ui.s }
     // progress dots
     Row { anchors.right: parent.right; anchors.rightMargin: ui.safe; y: 40 * ui.s; spacing: 10 * ui.s
         Repeater { model: wiz.count; Rectangle { width: index === wiz.index ? 34 * ui.s : 12 * ui.s; height: 12 * ui.s; radius: 6 * ui.s; color: index <= wiz.index ? theme.accent : theme.surface2; Behavior on width { NumberAnimation { duration: 200 } } } }
     }
-    Image { source: app.badgeUrl; anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: ui.safe * 0.6; width: 260 * ui.s; fillMode: Image.PreserveAspectFit; sourceSize.width: 800; opacity: 0.85 }
+    Rectangle {   // v2.1.0 small IIM credit pill (replaces the oversized SVG badge)
+        anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.rightMargin: ui.safe * 0.5; anchors.bottomMargin: 18 * ui.s
+        height: 40 * ui.s; width: wpr.implicitWidth + 22 * ui.s; radius: height / 2; color: theme.surface; opacity: 0.80
+        border.width: 1; border.color: Qt.rgba(1, 1, 1, 0.10)
+        Row { id: wpr; anchors.centerIn: parent; spacing: 9 * ui.s
+            Image { width: 26 * ui.s; height: 26 * ui.s; anchors.verticalCenter: parent.verticalCenter; sourceSize: Qt.size(96, 96); smooth: true
+                source: Icons.iimMark(theme.accent.toString(), theme.accent2.toString()) }
+            Text { anchors.verticalCenter: parent.verticalCenter; text: app.badgeText; color: theme.muted; font.family: theme.fontBody; font.weight: Font.DemiBold; font.pixelSize: 16 * ui.s } }
+    }
 
     // Dreamy column
     Item { id: left; x: ui.safe; y: 120 * ui.s; width: 520 * ui.s; height: parent.height - y - 100 * ui.s
@@ -36,7 +40,7 @@ Window {
         Text { id: title; text: wiz.stepTitle; color: theme.text; font.family: theme.fontDisplay; font.weight: Font.Bold; font.pixelSize: 54 * ui.s }
         Text { anchors.left: title.right; anchors.leftMargin: 20 * ui.s; anchors.baseline: title.baseline; text: "step " + (wiz.index + 1) + " of " + wiz.count; color: theme.muted; font.family: theme.fontBody; font.pixelSize: 24 * ui.s }
         Loader { id: body; anchors.top: title.bottom; anchors.topMargin: 36 * ui.s; width: parent.width; height: parent.height - y
-            sourceComponent: wiz.stepId === "welcome" ? welcome : wiz.stepId === "sources" ? sources : wiz.stepId === "pd" ? pd : wiz.stepId === "strict" ? strict : wiz.stepId === "chan83" ? chan83 : wiz.stepId === "toontown" ? toontown : wiz.stepId === "nas" ? nas : wiz.stepId === "youtube" ? youtube : wiz.stepId === "tmdb" ? tmdb : wiz.stepId === "skin" ? skin : wiz.stepId === "user" ? user : wiz.stepId === "summary" ? summary : done }
+            sourceComponent: wiz.stepId === "welcome" ? welcome : wiz.stepId === "sources" ? sources : wiz.stepId === "pd" ? pd : wiz.stepId === "strict" ? strict : wiz.stepId === "chan83" ? chan83 : wiz.stepId === "toontown" ? toontown : wiz.stepId === "nas" ? nas : wiz.stepId === "youtube" ? youtube : wiz.stepId === "tmdb" ? tmdb : wiz.stepId === "skin" ? skin : wiz.stepId === "user" ? user : wiz.stepId === "shortcuts" ? shortcuts : wiz.stepId === "summary" ? summary : done }
     }
     // nav
     Row { anchors.right: parent.right; anchors.rightMargin: ui.safe + 300 * ui.s; anchors.bottom: parent.bottom; anchors.bottomMargin: 60 * ui.s; spacing: 18 * ui.s
@@ -56,7 +60,7 @@ Window {
         BigToggleCard { title: "Public Domain"; icon: "film"; blurb: "Thousands of classics from archive.org, verified playable."; on: wiz.sources.publicdomain; onClicked: wiz.toggleSource("publicdomain") }
         BigToggleCard { title: "Channel 83"; icon: "tv"; blurb: "Anthology TV: Twilight Zone, Outer Limits, Hitchcock and more."; on: wiz.sources.chan83; onClicked: wiz.toggleSource("chan83") }
         BigToggleCard { title: "Toon Town"; icon: "toon"; blurb: "Classic cartoons by studio: Fleischer, Iwerks, Lantz, UPA."; on: wiz.sources.toontown; onClicked: wiz.toggleSource("toontown") }
-        BigToggleCard { title: "Your NAS"; icon: "folder"; blurb: "Movies, shows and music on your own network drives."; on: wiz.sources.nas; onClicked: wiz.toggleSource("nas") }
+        BigToggleCard { visible: !wiz.isWindows; title: "Your NAS"; icon: "folder"; blurb: "Movies, shows and music on your own network drives."; on: wiz.sources.nas; onClicked: wiz.toggleSource("nas") }
         BigToggleCard { title: "YouTube"; icon: "youtube"; blurb: "The channels you follow, in a native ad-free player."; on: wiz.sources.youtube; onClicked: wiz.toggleSource("youtube") } } }
     Component { id: pd; Column { spacing: 26 * ui.s; width: parent.width
         Text { text: "Decades"; color: theme.muted; font.family: theme.fontBody; font.weight: Font.Bold; font.pixelSize: 22 * ui.s; font.letterSpacing: 2 }
@@ -107,6 +111,9 @@ Window {
         Rectangle { width: 600 * ui.s; height: 80 * ui.s; radius: theme.radius; color: theme.surface; border.width: 1; border.color: Qt.rgba(1,1,1,0.10)
             TextField { anchors.fill: parent; anchors.margins: 10 * ui.s; placeholderText: "Password (optional)"; echoMode: TextInput.Password; color: theme.text; placeholderTextColor: theme.muted; font.family: theme.fontBody; font.pixelSize: 26 * ui.s; background: null; onEditingFinished: wiz.setPassword(text) } }
         Text { width: parent.width; text: "The user logs in automatically at boot and runs only the player. Your own account is untouched."; color: theme.muted; wrapMode: Text.WordWrap; font.family: theme.fontBody; font.pixelSize: 22 * ui.s } } }
+    Component { id: shortcuts; Column { spacing: 18 * ui.s; width: parent.width
+        Text { width: parent.width; text: "DreamReels gets a Start menu entry and a Desktop shortcut. Your Windows account and settings stay exactly as they are."; color: theme.text; wrapMode: Text.WordWrap; font.family: theme.fontBody; font.pixelSize: 24 * ui.s }
+        BigToggleCard { title: "Start when I sign in"; icon: "tv"; blurb: "Opens DreamReels full screen when you sign in."; on: wiz.startAtLogin; onClicked: wiz.setStartAtLogin(!wiz.startAtLogin) } } }
     Component { id: summary; Column { spacing: 10 * ui.s; width: parent.width
         Repeater { model: wiz.summaryLines
             Row { spacing: 20 * ui.s; Text { width: 220 * ui.s; text: modelData.k; color: theme.muted; font.family: theme.fontBody; font.weight: Font.Bold; font.pixelSize: 24 * ui.s }

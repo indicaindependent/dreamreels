@@ -15,7 +15,7 @@ def main(cfg: dict, argv=None) -> int:
     from PySide6.QtCore import QObject, Property, QTimer, QUrl, Signal
     from PySide6.QtGui import QGuiApplication, QFontDatabase
     from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
-    from .. import __version__, GITHUB_URL
+    from .. import __version__, GITHUB_URL, BADGE_TEXT
     from ..core.paths import ASSETS, CACHE_DIR, ensure_dirs
     from ..badge.iim import badge_svg
     from ..ui.theme import Theme
@@ -33,9 +33,28 @@ def main(cfg: dict, argv=None) -> int:
         plog.log(lvl, "Qt: %s", msg)
     qInstallMessageHandler(_qt_msg)
     plog.info("player boot: platform=%s video=%s windowed=%s argv=%s", os.environ.get("QT_QPA_PLATFORM"), not shot and not a.no_video, a.windowed, sys.argv[1:])
+    try:
+        if sys.platform == "win32": raise RuntimeError("skipped on Windows (PipeWire-only); using the default Windows output")
+        from . import audio as _audio; _audio.ensure_tv_audio()   # route sound to the HDMI TV, measured every boot (Sep 12 2026)
+        import threading as _thr
+        def _audio_recheck():  # Sep 26 2026: the TV can answer on the HDMI pin AFTER the player booted; keep checking, idempotent + cheap when already OK
+            for _d in (30, 60, 210, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600):
+                import time as _t; _t.sleep(_d)
+                try: _audio.ensure_tv_audio()
+                except Exception as _e2: plog.warning("TV audio recheck failed: %s", _e2)
+        _thr.Thread(target=_audio_recheck, name="tv-audio-recheck", daemon=True).start()
+    except Exception as _e: plog.warning("TV audio check failed: %s", _e)
+    video_enabled = not shot and not a.no_video
+    if video_enabled and sys.platform == "win32":   # Qt 6 on Windows defaults to Direct3D 11; the mpv render API needs OpenGL
+        from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
+        QQuickWindow.setGraphicsApi(QSGRendererInterface.GraphicsApi.OpenGL)
     app = QGuiApplication(sys.argv[:1])
     for f in (ASSETS / "fonts").glob("*.ttf"): QFontDatabase.addApplicationFont(str(f))
-    video_enabled = not shot and not a.no_video
+    if video_enabled:
+        from . import mpv_widget as _mw
+        if _mw.mpv is None:
+            plog.error("libmpv not found (%s): starting without video. Put libmpv-2.dll next to DreamReels.exe.", _mw.MPV_IMPORT_ERROR)
+            video_enabled = False
     if video_enabled:
         from .mpv_widget import MpvObject
         qmlRegisterType(MpvObject, "dreamreels", 1, 0, "MpvObject")
@@ -53,6 +72,7 @@ def main(cfg: dict, argv=None) -> int:
         def __init__(s): super().__init__(); s._kiosk = not a.windowed and not shot and cfg["meta"].get("input_mode") != "windowed"
         version = Property(str, lambda s: __version__, constant=True)
         githubUrl = Property(str, lambda s: GITHUB_URL, constant=True)
+        badgeText = Property(str, lambda s: BADGE_TEXT, constant=True)
         badgeUrl = Property(str, lambda s: QUrl.fromLocalFile(str(badge_path)).toString(), constant=True)
         qrUrl = Property(str, lambda s: QUrl.fromLocalFile(str(qr_path)).toString(), constant=True)
         kiosk = Property(bool, lambda s: s._kiosk, constant=True)

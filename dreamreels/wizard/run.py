@@ -9,7 +9,7 @@ def main(cfg: dict, argv=None) -> int:
     from PySide6.QtGui import QGuiApplication, QFontDatabase
     from PySide6.QtQml import QQmlApplicationEngine
     import PySide6.QtQuick  # noqa: F401 - without this the root Window is wrapped as plain QWindow (no grabWindow)
-    from .. import __version__, GITHUB_URL
+    from .. import __version__, GITHUB_URL, BADGE_TEXT
     from ..core.paths import ASSETS, CACHE_DIR, ensure_dirs
     from ..badge.iim import badge_svg
     from ..ui.theme import Theme
@@ -19,7 +19,7 @@ def main(cfg: dict, argv=None) -> int:
     badge_path = CACHE_DIR / "badge.svg"; badge_path.write_text(badge_svg())
     class App(QObject):
         version = Property(str, lambda s: __version__, constant=True); githubUrl = Property(str, lambda s: GITHUB_URL, constant=True)
-        badgeUrl = Property(str, lambda s: QUrl.fromLocalFile(str(badge_path)).toString(), constant=True)
+        badgeUrl = Property(str, lambda s: QUrl.fromLocalFile(str(badge_path)).toString(), constant=True); badgeText = Property(str, lambda s: BADGE_TEXT, constant=True)
         kiosk = Property(bool, lambda s: not a.windowed and not shot, constant=True)
     theme = Theme(a.theme or cfg["meta"].get("theme", "midnight")); wiz = WizardBackend(cfg); appobj = App()
     wiz.changed.connect(lambda: theme.load(wiz.theme) if theme.name != wiz.theme else None)

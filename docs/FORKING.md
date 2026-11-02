@@ -6,10 +6,12 @@
    * NAS: the wizard scans your LAN for SMB hosts, lists shares, you tick folders (music included).
    * YouTube: paste `@handle` links. yt-dlp needs a JavaScript runtime (node or deno).
 3. Pick a skin (midnight / paper / neon) — themes live in `dreamreels/ui/theme.py`, one dict each.
-4. Name the system user (default `dreamreels`), password optional.
+4. Name the system user (default `dreamreels`), password optional (Linux). On Windows this step is Shortcuts instead.
 5. `sudo bin/dreamreels-apply --dry-run` — read it. Then `--reboot`.
 
 ## Making it yours
+* **Channel 83 era**: `CHAN83_MAX_YEAR` in `sources/lanes_seed.py` (default 1969).
+* **Before you publish**: run `python3 tools/privacy_audit.py . --extra <your hostnames and usernames>`.
 * **Branding**: `dreamreels/__init__.py` holds the version, GitHub URL and badge text. The badge is generated
   per install (`badge/iim.py`) and links to *your* fork URL once you change `GITHUB_URL`.
 * **Themes**: add a dict to `theme.py`; the wizard offers every theme it finds.

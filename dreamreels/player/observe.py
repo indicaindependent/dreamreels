@@ -136,6 +136,13 @@ class Observatory:
         return st
 
     def shot(self) -> bytes:
+        # GUARD (Sep 12 2026, measured with gdb): QQuickWindow::grabWindow() from the GUI thread while the mpv FBO is rendering
+        # deadlocks the GUI thread on the render thread's QWaitCondition - the whole player froze at 0% CPU with playback
+        # running. Never grab during playback; the dashboard shows the telemetry instead.
+        try:
+            if getattr(self.backend, "playing", False) or getattr(self.backend, "_playing", False):
+                raise RuntimeError("screenshot disabled during playback (would deadlock the render thread)")
+        except AttributeError: pass
         def _grab():
             from PySide6.QtCore import QBuffer, QIODevice
             img = self.win.grabWindow(); buf = QBuffer(); buf.open(QIODevice.WriteOnly); img.save(buf, "PNG"); return bytes(buf.data())
@@ -168,6 +175,7 @@ class Observatory:
         if a == "detail": return {"ok": self.gui(lambda: (self.backend.openDetail(req["uid"]), True)[1])}
         if a == "lane": return {"ok": self.gui(lambda: (self.backend.loadLane(req["name"]), True)[1])}
         if a == "home": return {"ok": self.gui(lambda: (self.backend.loadHome(), True)[1])}
+        if a == "browse": return {"ok": self.gui(lambda: (self.backend.browseLane(req["lane"], list(req.get("path") or [])), True)[1])}
         if a == "stop": return {"ok": self.gui(lambda: (self.backend.stop(), True)[1])}
         if a == "pause": return {"ok": self.gui(lambda: (self.backend.togglePause(), True)[1])}
         if a == "seek": return {"ok": self.gui(lambda: (self.backend.seekRel(float(req.get("secs", 30))), True)[1])}

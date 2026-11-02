@@ -25,3 +25,27 @@ function svg(name, color) {
   var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>';
   return "data:image/svg+xml;utf8," + encodeURIComponent(s);
 }
+
+// ---- v2.1.0 brand marks (Nov 1 2026). Pure SVG, colors passed in, so every skin gets its own tint. No fonts inside the SVG,
+// so the marks render identically on every machine (letters are drawn as strokes, not text).
+function brandMark(a, b, hub) {   // DreamReels reel: gradient rim, six reel windows, hub, and a short film tail
+  var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/></linearGradient></defs>' +
+    '<path d="M44 55 C52 59 58 58 62 52" fill="none" stroke="url(#g)" stroke-width="4" stroke-linecap="round" opacity="0.85"/>' +
+    '<circle cx="30" cy="30" r="26" fill="none" stroke="url(#g)" stroke-width="5"/>' +
+    '<circle cx="30" cy="30" r="19.5" fill="none" stroke="url(#g)" stroke-width="1.6" opacity="0.45"/>';
+  for (var i = 0; i < 6; i++) {
+    var t = (i * 60 - 90) * Math.PI / 180;
+    s += '<circle cx="' + (30 + 12.5 * Math.cos(t)).toFixed(2) + '" cy="' + (30 + 12.5 * Math.sin(t)).toFixed(2) + '" r="4.6" fill="url(#g)"/>';
+  }
+  s += '<circle cx="30" cy="30" r="3.4" fill="' + hub + '"/></svg>';
+  return "data:image/svg+xml;utf8," + encodeURIComponent(s);
+}
+function iimMark(a, b) {   // Indica Independent Media monogram: gradient tile, IIM drawn as strokes
+  var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">' +
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/></linearGradient></defs>' +
+    '<rect x="1" y="1" width="46" height="46" rx="12" fill="url(#g)"/>' +
+    '<g fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M11.5 15v18"/><path d="M19 15v18"/><path d="M26.5 33V15l5.75 10.5L38 15v18"/></g></svg>';
+  return "data:image/svg+xml;utf8," + encodeURIComponent(s);
+}

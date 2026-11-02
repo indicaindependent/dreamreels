@@ -6,7 +6,19 @@ under mutter/Wayland). Industry-standard Qt+mpv integration.
 """
 from PySide6.QtCore import Qt, QObject, Signal
 from PySide6.QtQuick import QQuickFramebufferObject
-import mpv, logging
+import os, sys, logging
+if sys.platform == "win32":   # python-mpv loads mpv-2.dll / libmpv-2.dll via PATH; put the bundle and exe folders first
+    for _d in (getattr(sys, "_MEIPASS", None), os.path.dirname(sys.executable)):
+        if _d and os.path.isdir(_d):
+            os.environ["PATH"] = _d + os.pathsep + os.environ.get("PATH", "")
+            try: os.add_dll_directory(_d)
+            except (AttributeError, OSError): pass
+try:
+    import mpv
+except (OSError, ImportError) as _e:   # surfaced by player/run.py as a toast instead of a crash
+    mpv = None; MPV_IMPORT_ERROR = str(_e)
+else:
+    MPV_IMPORT_ERROR = ""
 log = logging.getLogger("dreamreels.player")
 
 
@@ -67,7 +79,7 @@ class MpvObject(QQuickFramebufferObject):
             hwdec="auto-safe",
             ytdl=bool(_yt),  # YouTube lane: mpv resolves via the NEWEST yt-dlp on the machine (stale binaries 403)
             **({"script_opts": f"ytdl_hook-ytdl_path={_yt}"} if _yt else {}),
-            user_agent="DreamReels/2.0 (+github.com/indicaindependent/dreamreels)",
+            user_agent="DreamReels/2.1 (+github.com/indicaindependent/dreamreels)",
             keep_open="no",
             cache="yes",
             demuxer_max_bytes="150MiB",
@@ -95,6 +107,9 @@ class MpvObject(QQuickFramebufferObject):
             "audio-channels": "auto-safe",
             "audio-pitch-correction": "yes",
             "ytdl-format": "bestvideo[height<=2160]+bestaudio/best",
+            "ytdl-raw-options": "js-runtimes=node",   # Phase D: same runtime fix as core.tools.yt_direct_url
+            "background": "color",                    # transparent visualizer output over black, never the checkerboard tiles
+            "background-color": "#000000",
         }
         applied, rejected = [], []
         for k, v in tuned.items():

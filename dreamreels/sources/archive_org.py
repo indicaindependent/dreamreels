@@ -74,10 +74,14 @@ def search(query: str, rows=50, page=1, sort="downloads desc") -> list[dict]:
     return (j.get("response") or {}).get("docs") or []
 
 def discover_query(decade: int | None = None, genre: str | None = None) -> str:
-    q = ["mediatype:movies", "collection:(feature_films OR SciFi_Horror OR Film_Noir OR classic_tv OR comedy_films OR silent_films)"]
+    q = ["mediatype:movies", "collection:(feature_films OR SciFi_Horror OR Film_Noir OR classic_tv OR comedy_films OR silent_films OR moviesandfilms OR classic_cartoons OR animationandcartoons)"]
     if decade: q.append(f"year:[{decade} TO {decade + 9}]")
     if genre: g = genre.replace("Film-Noir", "noir").replace("Sci-Fi", "science fiction"); q.append(f"(subject:({g}) OR description:({g}))")
     return " AND ".join(q)
+
+TVMOVIE_QUERY = ('mediatype:movies AND year:[1970 TO 1989] AND (title:("movie of the week") OR subject:("tv movie" OR "television movie" OR '
+                 '"made for tv" OR "made-for-tv movie" OR telefilm) OR description:("made for tv" OR "made-for-tv" OR "made for television" OR '
+                 '"tv movie" OR "television movie" OR "television film" OR telefilm OR "movie of the week" OR "world premiere movie"))')
 
 def prefilter(url: str, timeout=9) -> tuple[bool, str]:
     """Cheap negative filter only: a 404/500/html body is dead. A pass here proves nothing."""

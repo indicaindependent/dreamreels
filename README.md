@@ -1,7 +1,7 @@
-# DreamReels 2 — "Dreamy" release (alpha)
+# DreamReels 2.1
 
-A forkable, 10-foot home media player for a Linux box under your TV. Python 3.12+, PySide6/QML,
-libmpv. Dreamy, the mascot, walks you through setup once; after that the machine grows its own
+A forkable, 10-foot home media player for a Linux box under your TV, or a Windows PC. Python 3.11+,
+PySide6/QML, libmpv. Dreamy, the mascot, walks you through setup once; after that the machine grows its own
 library every night and never hands you a button that does not play.
 
     git clone https://github.com/indicaindependent/dreamreels && cd dreamreels && ./install.sh
@@ -9,16 +9,28 @@ library every night and never hands you a button that does not play.
     sudo bin/dreamreels-apply --dry-run   # shows exactly what the root half would change
     sudo bin/dreamreels-apply --reboot    # user, mounts, yt-dlp, autologin, service
 
+**Windows:** download `DreamReels.exe` from the Releases page and double-click it. Setup runs the first time.
+On Windows the "System user" step becomes **Shortcuts**: a Start menu entry, a Desktop shortcut, and (if you
+tick it) start-when-I-sign-in. Your Windows account is not changed. Settings live in `%APPDATA%\DreamReels`,
+the library, logs and posters in `%LOCALAPPDATA%\DreamReels`. The YouTube lane needs `yt-dlp.exe` next to
+`DreamReels.exe` or on your PATH. NAS mounting is Linux-only; on Windows, map the drive in Explorer.
+
 ## What it plays
 | lane | where it comes from | how it is verified |
 |---|---|---|
 | **Public Domain** | archive.org feature films, picked by decade / genre / people | every file must decode 48 frames in mpv before it is marked playable |
-| **Channel 83** | public-domain anthology TV (Twilight Zone, Outer Limits 1963-65 *and* 1995-2002, Suspense, One Step Beyond, Thriller, Hitchcock Presents, Lights Out) | same decode proof, pre-mapped episode lists |
+| **Channel 83** | public-domain anthology TV from before 1970 (Twilight Zone, Outer Limits 1963-65, Suspense, One Step Beyond, Thriller, Hitchcock Presents, Lights Out) | same decode proof, pre-mapped episode lists |
 | **Toon Town** | 15 classic cartoon series / 334 shorts (Fleischer, Iwerks, Van Beuren, WB, Lantz, UPA…) | same |
 | **NAS** | your own SMB shares, discovered and mounted by the wizard, movies / TV / music | local file present |
 | **YouTube** | channels you paste as `@handle` links, ad-free through mpv + yt-dlp | 24-frame decode + duration match |
 
 Posters, blurbs, directors and cast come from TMDB (bring your own free Read Access Token).
+
+**archive.org dependency:** every public-domain, Channel 83 and Toon Town title streams live from archive.org.
+When archive.org is down, those titles will not play until it comes back. NAS and YouTube are unaffected.
+
+**Channel 83 era rule:** Channel 83 shows only TV first aired before 1970. The cut-off is one constant,
+`CHAN83_MAX_YEAR = 1969` in `dreamreels/sources/lanes_seed.py`. Raise it in your fork if you want later shows.
 
 ## Dreamy, the agent
 Press **D** (or the Dreamy button). Ask in plain words:
@@ -46,6 +58,7 @@ dreamreels/
   apply.py    the root half: user, fstab, yt-dlp, GDM autologin, systemd user units
   migrate/    importer for DreamReel v1 libraries
   badge/      the IIM "Created with Creative Clarity" badge (unique per install)
+packaging/   windows/ PyInstaller spec + entry script for the single-file DreamReels.exe
 tests/        pytest, no Qt required
 ```
 
@@ -59,7 +72,8 @@ tests/        pytest, no Qt required
 | `python3 -m dreamreels doctor` | measure tools, network, token, mounts, library, a live YouTube decode |
 | `python3 -m dreamreels verify-url URL` | decode-proof one URL |
 | `python3 -m dreamreels import-v1 [--db PATH]` | import a DreamReel v1 library |
-| `sudo bin/dreamreels-apply [--dry-run] [--reboot]` | root half of setup |
+| `sudo bin/dreamreels-apply [--dry-run] [--reboot]` | root half of setup (Linux) |
+| `python3 tools/privacy_audit.py . --extra yourhost yourname` | scan your fork for private IPs, emails, keys, home paths before you publish |
 
 ## Design rules this codebase keeps
 * **Verified means decoded.** Not a HEAD, not a 206 on two kilobytes, not a resolve. Frames.
@@ -69,5 +83,15 @@ tests/        pytest, no Qt required
 * **Untrusted text is data.** archive.org, YouTube and TMDB content is displayed, never executed or fed to a model.
 
 See [docs/FORKING.md](docs/FORKING.md) to make it yours, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the data model.
+
+## Building the Windows exe
+`.github/workflows/windows.yml` builds `DreamReels.exe` on GitHub's Windows runners: it installs the package,
+downloads a pinned libmpv build and checks its SHA-256, runs PyInstaller with `packaging/windows/DreamReels.spec`,
+then starts the exe in self-test mode (bundled QML, assets, lane seeds and libmpv must all load) before it
+uploads the file and its checksum. Push a `v*` tag to attach the exe to a release with build provenance.
+
+## Credit
+DreamReels is made by Indica Independent Media. The small "Created with Creative Clarity" credit in the
+corner stays in forks, please.
 
 This product uses the TMDB API but is not endorsed or certified by TMDB. Licence: MIT.

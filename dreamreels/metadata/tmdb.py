@@ -9,8 +9,8 @@ API = "https://api.themoviedb.org/3"; IMG = "https://image.tmdb.org/t/p/"
 UA = f"DreamReels/{__version__} (+{GITHUB_URL})"
 
 def _fetch_image_bytes(url: str, timeout=15) -> bytes | None:
-    """image.tmdb.org is a multi-CDN host; some edges are unreachable from some networks (measured: one CDN's
-    edge gave 'No route to host' over a VPN egress while another edge served 200). Try the resolver's answer first, then every
+    """image.tmdb.org is a multi-CDN host; some edges are unreachable from some networks (measured: bunny 185.93.1.x
+    'No route to host' over a VPN egress while 143.244.60.196 served 200). Try the resolver's answer first, then every
     A record from Google DoH, pinning SNI + Host so the CDN still serves the right site."""
     import http.client, json, socket, ssl
     from urllib.parse import urlparse
@@ -59,17 +59,20 @@ class TMDB:
             return json.loads(body or b"{}")
         finally: c.close()
     def search_movie(self, title: str, year: int | None = None) -> dict | None:
-        p = {"query": title, "include_adult": "false"}
-        if year: p["year"] = year
-        j = self._get("/search/movie", p) or {}; res = j.get("results") or []
-        if not res and year: j = self._get("/search/movie", {"query": title, "include_adult": "false"}) or {}; res = j.get("results") or []
-        if not res: return None
-        norm = lambda s: re.sub(r"[^a-z0-9]", "", (s or "").lower())
-        for r in res:
-            ry = int((r.get("release_date") or "0000")[:4] or 0)
-            if norm(r.get("title")) == norm(title) and (not year or abs(ry - year) <= 2): return r
-        r = res[0]; ry = int((r.get("release_date") or "0000")[:4] or 0)
-        return r if (not year or abs(ry - year) <= 3) else None
+        """Phase M (Oct 13 2026): normalizer + confidence matcher (metadata/match.py). Dry run on 120 previously
+        unmapped items: old matcher 0 hits, new matcher 63, every sampled hit correct. The last-resort row carries
+        '_match' = (confidence, reason) for the grower's note."""
+        from . import match as _m
+        for q, y in _m.variants(title, year):
+            p = {"query": q, "include_adult": "false"}
+            if y: p["year"] = y
+            j = self._get("/search/movie", p) or {}; res = j.get("results") or []
+            if not res and y:
+                j = self._get("/search/movie", {"query": q, "include_adult": "false"}) or {}; res = j.get("results") or []
+            hit, conf, why = _m.pick(res, q, y)
+            if hit:
+                hit = dict(hit); hit["_match"] = (round(conf, 2), why, q); return hit
+        return None
     def movie(self, tmdb_id: int) -> dict | None: return self._get(f"/movie/{tmdb_id}", {"append_to_response": "credits"})
     def tv(self, tmdb_id: int) -> dict | None: return self._get(f"/tv/{tmdb_id}")
     def season(self, tmdb_id: int, n: int) -> dict | None: return self._get(f"/tv/{tmdb_id}/season/{n}")

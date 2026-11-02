@@ -8,7 +8,11 @@
 --dry-run prints every command and file it WOULD write and changes nothing. Every step re-reads the
 system afterwards and reports what it measured, not what it intended."""
 from __future__ import annotations
-import argparse, json, os, pwd, grp, re, shutil, subprocess, sys, time, urllib.request
+import argparse, json, os, re, shutil, subprocess, sys, time, urllib.request
+if sys.platform == "win32":   # the root half is Linux-only (useradd, fstab, GDM, systemd); Windows uses wizard shortcuts instead
+    pwd = grp = None
+else:
+    import pwd, grp
 from pathlib import Path
 
 ETC = Path("/etc/dreamreels"); FSTAB = Path("/etc/fstab"); GDM = Path("/etc/gdm3/custom.conf")
@@ -125,6 +129,12 @@ class Apply:
         node = shutil.which("node") or shutil.which("deno") or "NONE (yt-dlp needs a JS runtime for YouTube)"
         self.log(True, "yt-dlp", f"{before} -> {after}; js runtime: {node}")
     # 4 ---------------------------------------------------------------
+    def step_tmdb_seed(self):
+        tok = (self.plan.get("tmdb_token") or "").strip()
+        if not tok: self.log(True, "TMDB seed", "no token in plan, nothing written"); return
+        if self.dry: self.log(True, "TMDB seed", "/etc/dreamreels/tmdb.token would be written"); return
+        ETC.mkdir(parents=True, exist_ok=True); (ETC / "tmdb.token").write_text(tok + "\n"); (ETC / "tmdb.token").chmod(0o644)
+        self.log((ETC / "tmdb.token").read_text().strip() == tok, "TMDB seed", "/etc/dreamreels/tmdb.token (prefills the wizard after a reset)")
     def step_autologin(self):
         if not GDM.exists(): self.log(False, "GDM autologin", f"{GDM} missing (not a GDM system; lightdm/sddm not handled yet)"); return
         txt = GDM.read_text(); new = txt
@@ -202,7 +212,7 @@ def main(argv=None) -> int:
     if not plan_path or not plan_path.exists(): print("no plan.json found - run `dreamreels wizard` first", file=sys.stderr); return 3
     plan = json.loads(plan_path.read_text()); print(f"plan: {plan_path} (written {time.strftime('%Y-%m-%d %H:%M', time.localtime(plan.get('written', 0)))}) user={plan.get('user')} mounts={len(plan.get('mounts') or [])} youtube={plan.get('youtube')} theme={plan.get('theme')}\n")
     A = Apply(plan, a.dry_run, plan_path.parent)
-    for step in (A.step_user, A.step_mounts, A.step_ytdlp, A.step_autologin, A.step_service): 
+    for step in (A.step_user, A.step_mounts, A.step_ytdlp, A.step_tmdb_seed, A.step_autologin, A.step_service): 
         try: step()
         except Exception as e: A.log(False, step.__name__, f"exception: {str(e)[:120]}")
     A.step_reboot(a.reboot and not a.no_reboot and not a.dry_run)

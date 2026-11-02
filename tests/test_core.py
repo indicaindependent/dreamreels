@@ -11,7 +11,7 @@ def test_config_roundtrip():
     assert again["publicdomain"]["strict_pd"] is True
 
 def test_db_migrates_and_is_idempotent():
-    assert db.migrate() == 1 and db.migrate() == 1
+    v = db.migrate(); assert v >= 1 and db.migrate() == v   # idempotent at whatever the current schema version is
     c = db.connect(); names = {r[0] for r in c.execute("select name from sqlite_master where type='table'")}
     assert {"items", "shows", "people", "state", "jobs", "yt_channels", "provenance"} <= names
 

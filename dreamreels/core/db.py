@@ -45,6 +45,11 @@ CREATE TABLE IF NOT EXISTS provenance(
   id INTEGER PRIMARY KEY AUTOINCREMENT, ts REAL, action TEXT, target TEXT, origin TEXT, note TEXT
 );
 """,
+    """
+    -- v2.2 Phase T: trailer/short classification (0 feature, 1 trailer, 2 under-5-minute short)
+    ALTER TABLE items ADD COLUMN trailer INTEGER NOT NULL DEFAULT 0;
+    CREATE INDEX IF NOT EXISTS idx_items_trailer ON items(trailer);
+    """,
 ]
 
 def connect(path=None) -> sqlite3.Connection:

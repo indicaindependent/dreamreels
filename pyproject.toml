@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dreamreels"
-version = "2.0.0a1"
+version = "2.1.0"
 description = "DreamReels - a forkable 10-foot home media player with Dreamy, public-domain cinema, your NAS, and an ad-free YouTube lane."
 readme = "README.md"
 requires-python = ">=3.11"

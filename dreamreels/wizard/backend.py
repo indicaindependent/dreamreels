@@ -1,7 +1,8 @@
 """Wizard state machine. Steps are data; Dreamy's lines live here so forkers can rewrite them.
 Nothing here needs root: the wizard writes config.toml + plan.json; `dreamreels-apply` (P5) performs the root part."""
 from __future__ import annotations
-import json, os, re, threading, time
+import json, os, re, sys, threading, time
+IS_WINDOWS = sys.platform == "win32"
 from PySide6.QtCore import QObject, Signal, Slot, Property
 from ..core import config as cfgmod
 from ..core.paths import PLAN_FILE, CACHE_DIR, ensure_dirs
@@ -10,7 +11,7 @@ from ..ui.theme import available as themes_available
 
 DECADES = [1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980]
 GENRES = ["Film-Noir", "Horror", "Sci-Fi", "Comedy", "Drama", "Western", "Mystery", "Romance", "Thriller", "Adventure", "War", "Documentary", "Animation", "Musical"]
-CHAN83 = ["The Twilight Zone", "The Outer Limits (1963 + 1995)", "Suspense", "One Step Beyond", "Thriller", "Alfred Hitchcock Presents", "Lights Out"]
+CHAN83 = ["The Twilight Zone", "The Outer Limits (1963)", "Suspense", "One Step Beyond", "Thriller", "Alfred Hitchcock Presents", "Lights Out"]
 TOON = ["Fleischer", "Ub Iwerks", "Van Beuren", "US War Dept / WB", "Walter Lantz", "Fleischer/Famous", "UPA", "Warner Bros."]
 
 STEPS = [  # id, title, Dreamy pose, Dreamy line
@@ -24,6 +25,8 @@ STEPS = [  # id, title, Dreamy pose, Dreamy line
     ("youtube", "YouTube", "point", "Paste the channels you follow, one @handle per line. I play them with a native player: there is no ad client to inject into, so there are no ads. This lane depends on tools that break when YouTube changes; I'll show you a health check."),
     ("tmdb", "Movie database key", "think", "Posters and descriptions come from TMDB. It's free: get a Read Access Token at themoviedb.org/settings/api and paste it here. You can skip and add it later."),
     ("skin", "Choose a look", "celebrate", "Three skins. Pick the one that feels like your living room."),
+    ("shortcuts", "Shortcuts", "think", "I'll put DreamReels in your Start menu and on your Desktop. I can also start it each time you sign in to Windows.")
+    if IS_WINDOWS else
     ("user", "System user", "think", "I'll create a 'dreamreels' user that logs in automatically and starts the player. A password is optional."),
     ("summary", "Ready to build", "point", "Here's everything I'm about to do. Nothing has changed yet. Press Build when you're happy."),
     ("done", "Building", "celebrate", "I am setting everything up. Each line below is something I checked on this machine."),
@@ -38,7 +41,12 @@ class WizardBackend(QObject):
         self.decades = set(cfg["publicdomain"].get("decades") or [1930, 1940, 1950]); self.genres = set(cfg["publicdomain"].get("genres") or ["Film-Noir", "Horror", "Sci-Fi"])
         self.chan83 = set(CHAN83); self.toon = set(TOON)
         self.handles = list(cfg["youtube"].get("channels") or []); self.tmdb = cfg["tmdb"].get("read_token", "")
-        self.theme = cfg["meta"].get("theme", "midnight"); self.username = "dreamreels"; self.password = ""
+        if not self.tmdb:   # a token left by an earlier install (apply writes /etc/dreamreels/tmdb.token) prefills the step; the user can still clear it
+            try:
+                seed = open("/etc/dreamreels/tmdb.token").read().strip()
+                if seed: self.tmdb = seed; self.tmdb_seeded = True
+            except Exception: pass
+        self.theme = cfg["meta"].get("theme", "midnight"); self.username = "dreamreels"; self.password = ""; self.start_at_login = False
         self.nas_hosts: list[dict] = []; self.nas_picked: set[str] = set(); self.nas_scanning = False
         self._mascot_cache = {}; self._build_lines: list[str] = []; self._building = False; self._built = False
     # ---- steps ----
@@ -48,6 +56,7 @@ class WizardBackend(QObject):
             sid = s[0]
             if sid in ("pd", "strict") and not self.sel["publicdomain"]: continue
             if sid in ("chan83", "toontown", "nas", "youtube") and not self.sel[sid]: continue
+            if sid == "nas" and IS_WINDOWS: continue   # Windows: map the drive in Explorer instead
             out.append(s)
         return out
     @Property(int, notify=changed)
@@ -83,6 +92,12 @@ class WizardBackend(QObject):
     def sources(self): return self.sel
     @Slot(str)
     def toggleSource(self, k): self.sel[k] = not self.sel[k]; self.changed.emit()
+    @Property(bool, constant=True)
+    def isWindows(self): return IS_WINDOWS
+    @Property(bool, notify=changed)
+    def startAtLogin(self): return self.start_at_login
+    @Slot(bool)
+    def setStartAtLogin(self, v): self.start_at_login = bool(v); self.changed.emit()
     @Property(bool, notify=changed)
     def strictPd(self): return self.strict
     @Slot(bool)
@@ -166,7 +181,9 @@ class WizardBackend(QObject):
         if self.sel["nas"]: L.append(("NAS", f"{len(self.nas_picked)} share(s) → /etc/fstab automount (root step)"))
         if self.sel["youtube"]: L.append(("YouTube", f"{len(self.handles)} channel(s); tools installed + health-checked (root step)"))
         L.append(("TMDB", "token set" if self.tmdb else "not set (text tiles until you add one)"))
-        L.append(("Skin", self.theme)); L.append(("System", f"user '{self.username}' {'with' if self.password else 'without'} password · autologin · player service · reboot (root step)"))
+        L.append(("Skin", self.theme))
+        if IS_WINDOWS: L.append(("Shortcuts", "Start menu + Desktop" + (" + start when I sign in" if self.start_at_login else "")))
+        else: L.append(("System", f"user '{self.username}' {'with' if self.password else 'without'} password · autologin · player service · reboot (root step)"))
         return [{"k": k, "v": v} for k, v in L]
     @Slot(result=bool)
     def writePlan(self):
@@ -175,10 +192,12 @@ class WizardBackend(QObject):
         cfg["youtube"]["channels"] = list(self.handles); cfg["tmdb"]["read_token"] = self.tmdb; cfg["meta"]["theme"] = self.theme
         cfg["nas"]["mounts"] = sorted(self.nas_picked); cfg["meta"]["setup_complete"] = True
         cfgmod.save(cfg)
-        plan = {"version": 1, "written": time.time(), "user": self.username, "password_set": bool(self.password), "mounts": sorted(self.nas_picked), "youtube": self.sel["youtube"], "sources": self.sel, "chan83": sorted(self.chan83), "toontown": sorted(self.toon), "theme": self.theme}
-        PLAN_FILE.write_text(json.dumps(plan, indent=2)); os.chmod(PLAN_FILE, 0o600)
+        plan = {"version": 1, "written": time.time(), "tmdb_token": self.tmdb, "user": self.username, "password_set": bool(self.password), "start_at_login": self.start_at_login, "mounts": sorted(self.nas_picked), "youtube": self.sel["youtube"], "sources": self.sel, "chan83": sorted(self.chan83), "toontown": sorted(self.toon), "theme": self.theme}
+        PLAN_FILE.write_text(json.dumps(plan, indent=2))
+        if not IS_WINDOWS: os.chmod(PLAN_FILE, 0o600)
         if self.password:
-            pw = PLAN_FILE.with_name("plan.secret"); pw.write_text(self.password); os.chmod(pw, 0o600)
+            pw = PLAN_FILE.with_name("plan.secret"); pw.write_text(self.password)
+            if not IS_WINDOWS: os.chmod(pw, 0o600)
         self.toast.emit(f"Wrote {PLAN_FILE}"); self._i = len(self._active_steps()) - 1; self.changed.emit(); return True
     # ---- build ----
     @Property("QVariantList", notify=buildChanged)
