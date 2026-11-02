@@ -1,5 +1,19 @@
 # DreamReels 2.1
 
+<div align="center">
+
+<a href="https://github.com/indicaindependent/dreamreels"><img src="https://raw.githubusercontent.com/indicaindependent/dreamreels/main/assets/dreamreels-cover.svg" alt="DreamReels: a forkable 10-foot home media player for a Linux box under your TV or a Windows PC. Every title is decode-verified before it can be played. MIT." width="100%"></a>
+
+### *A forkable, 10-foot home media player for a Linux box under your TV, or a Windows PC.*
+
+**[Download DreamReels.exe](https://github.com/indicaindependent/dreamreels/releases/latest)** &nbsp; / &nbsp; **[Install on Linux](#dreamreels-21)** &nbsp; / &nbsp; **[What it plays](#what-it-plays)**
+
+[Python 3.11+](https://python.org) · [PySide6 / QML / libmpv](https://pyside.org) · [License: MIT](LICENSE)
+
+</div>
+
+---
+
 A forkable, 10-foot home media player for a Linux box under your TV, or a Windows PC. Python 3.11+,
 PySide6/QML, libmpv. Dreamy, the mascot, walks you through setup once; after that the machine grows its own
 library every night and never hands you a button that does not play.
@@ -16,6 +30,8 @@ the library, logs and posters in `%LOCALAPPDATA%\DreamReels`. The YouTube lane n
 `DreamReels.exe` or on your PATH. NAS mounting is Linux-only; on Windows, map the drive in Explorer.
 
 ## What it plays
+<a href="https://github.com/indicaindependent/dreamreels"><img src="https://raw.githubusercontent.com/indicaindependent/dreamreels/main/assets/dreamreels-features.svg" alt="What DreamReels does, in four panels: lanes from archive.org plus NAS and YouTube, Dreamy the setup agent, decode verification before play, and single-file Windows exe." width="100%"></a>
+
 | lane | where it comes from | how it is verified |
 |---|---|---|
 | **Public Domain** | archive.org feature films, picked by decade / genre / people | every file must decode 48 frames in mpv before it is marked playable |

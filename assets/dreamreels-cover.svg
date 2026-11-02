@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="t d">
+<title id="t">DreamReels: A forkable 10-foot home media player.</title>
+<desc id="d">Cover for the DreamReels repository. Wordmark DREAMREELS, tagline, TV lane view with poster cards, reel logo motif, and 3 promise pills: Every title decode-verified, Linux box or Windows PC, MIT.</desc>
+<rect width="1200" height="440" fill="#0B1015"/>
+<rect x="0.5" y="0.5" width="1199" height="439" fill="none" stroke="#33424F"/>
+
+<!-- LEFT COLUMN: BRAND & PROMISES -->
+<g transform="translate(48, 44)">
+  <!-- Logo container & redrawn reel logo -->
+  <rect x="0" y="0" width="56" height="56" rx="14" fill="#0B0F17" stroke="#33424F"/>
+  <g transform="translate(28, 28)">
+    <circle cx="0" cy="0" r="21" fill="none" stroke="#2DD4E8" stroke-width="3.5"/>
+    <circle cx="0" cy="0" r="15" fill="none" stroke="#FB7185" stroke-width="1.5"/>
+    <!-- Reel holes -->
+    <circle cx="0" cy="-10" r="3.2" fill="#FB7185"/>
+    <circle cx="8.66" cy="-5" r="3.2" fill="#FB7185"/>
+    <circle cx="8.66" cy="5" r="3.2" fill="#FB7185"/>
+    <circle cx="0" cy="10" r="3.2" fill="#FB7185"/>
+    <circle cx="-8.66" cy="5" r="3.2" fill="#FB7185"/>
+    <circle cx="-8.66" cy="-5" r="3.2" fill="#FB7185"/>
+    <circle cx="0" cy="0" r="2.8" fill="#F3F7F9"/>
+    <!-- Tape tail -->
+    <path d="M 14 16 C 18 20 22 19 25 15" fill="none" stroke="#2DD4E8" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="72" y="42" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="38" font-weight="700" fill="#F3F7F9" letter-spacing="2.5">DREAMREELS</text>
+
+  <!-- Subtitle -->
+  <text x="0" y="86" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="600" fill="#2DD4E8">A forkable 10-foot home media player.</text>
+
+  <!-- Promise Pill 1 -->
+  <rect x="0" y="116" width="372" height="38" rx="4" fill="#161E27" stroke="#33424F"/>
+  <circle cx="20" cy="135" r="5" fill="#4ADE80"/>
+  <text x="36" y="140" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="13" font-weight="500" fill="#F3F7F9">Every title decode-verified</text>
+
+  <!-- Promise Pill 2 -->
+  <rect x="0" y="164" width="372" height="38" rx="4" fill="#161E27" stroke="#33424F"/>
+  <circle cx="20" cy="183" r="5" fill="#2DD4E8"/>
+  <text x="36" y="188" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="13" font-weight="500" fill="#F3F7F9">Linux box or Windows PC</text>
+
+  <!-- Promise Pill 3 -->
+  <rect x="0" y="212" width="372" height="38" rx="4" fill="#161E27" stroke="#33424F"/>
+  <circle cx="20" cy="231" r="5" fill="#F5A524"/>
+  <text x="36" y="236" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="13" font-weight="500" fill="#F3F7F9">MIT License (Free &amp; Open Source)</text>
+
+  <!-- Footer Info -->
+  <text x="0" y="286" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#A7B6C2">PySide6 / QML / libmpv  •  v2.1.0</text>
+  <text x="0" y="308" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#A7B6C2">Indica Independent Media</text>
+  <text x="0" y="330" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#2DD4E8">github.com/indicaindependent/dreamreels</text>
+</g>
+
+<!-- RIGHT COLUMN: STYLISED TV LANE VIEW -->
+<g transform="translate(464, 40)">
+  <!-- Outer TV bezel -->
+  <rect x="0" y="0" width="688" height="360" rx="10" fill="#161E27" stroke="#33424F"/>
+  <!-- Inner TV Screen -->
+  <rect x="12" y="12" width="664" height="336" rx="6" fill="#0D131A" stroke="#1E2833"/>
+
+  <!-- TV Top Bar -->
+  <text x="28" y="36" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="11" font-weight="700" fill="#2DD4E8" letter-spacing="1">DREAMREELS 2.1  /  PUBLIC DOMAIN MOVIES</text>
+
+  <!-- Status badges right -->
+  <rect x="502" y="24" width="70" height="18" rx="3" fill="#1E2833" stroke="#4ADE80"/>
+  <circle cx="512" cy="33" r="3" fill="#4ADE80"/>
+  <text x="520" y="36" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="9" font-weight="700" fill="#4ADE80">VERIFIED</text>
+
+  <rect x="580" y="24" width="64" height="18" rx="3" fill="#1E2833" stroke="#2DD4E8"/>
+  <text x="588" y="36" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="9" font-weight="700" fill="#2DD4E8">AGENT [D]</text>
+
+  <!-- TV Poster Cards Lane Row -->
+  <!-- Card 1 -->
+  <g transform="translate(28, 54)">
+    <rect x="0" y="8" width="112" height="170" rx="5" fill="#161E27" stroke="#33424F"/>
+    <rect x="8" y="16" width="96" height="85" rx="3" fill="#0D131A"/>
+    <!-- Abstract art 1 -->
+    <circle cx="56" cy="58.5" r="18" fill="#161E27" stroke="#2DD4E8" stroke-width="1.5"/>
+    <circle cx="56" cy="58.5" r="4" fill="#2DD4E8"/>
+    <rect x="16" y="110" width="80" height="14" rx="2" fill="#1E2833"/>
+    <text x="56" y="121" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" fill="#A7B6C2" text-anchor="middle">FEATURE FILM</text>
+    <rect x="20" y="132" width="72" height="14" rx="2" fill="#1E2833" stroke="#4ADE80"/>
+    <text x="56" y="142" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" font-weight="700" fill="#4ADE80" text-anchor="middle">DECODED</text>
+  </g>
+
+  <!-- Card 2 -->
+  <g transform="translate(152, 54)">
+    <rect x="0" y="8" width="112" height="170" rx="5" fill="#161E27" stroke="#33424F"/>
+    <rect x="8" y="16" width="96" height="85" rx="3" fill="#0D131A"/>
+    <!-- Abstract art 2 -->
+    <rect x="36" y="36" width="40" height="45" rx="2" fill="#161E27" stroke="#F5A524" stroke-width="1.5"/>
+    <path d="M 44 48 H 68 M 44 56 H 64 M 44 64 H 60" stroke="#F5A524" stroke-width="1.5"/>
+    <rect x="16" y="110" width="80" height="14" rx="2" fill="#1E2833"/>
+    <text x="56" y="121" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" fill="#A7B6C2" text-anchor="middle">TV ANTHOLOGY</text>
+    <rect x="20" y="132" width="72" height="14" rx="2" fill="#1E2833" stroke="#4ADE80"/>
+    <text x="56" y="142" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" font-weight="700" fill="#4ADE80" text-anchor="middle">DECODED</text>
+  </g>
+
+  <!-- Card 3: HIGHLIGHTED CARD -->
+  <g transform="translate(272, 48)">
+    <!-- Selection highlight ring -->
+    <rect x="-4" y="-4" width="128" height="186" rx="8" fill="none" stroke="#2DD4E8" stroke-width="2.5"/>
+    <rect x="0" y="0" width="120" height="178" rx="6" fill="#1E2833" stroke="#2DD4E8"/>
+    <!-- Main poster art box -->
+    <rect x="8" y="8" width="104" height="88" rx="3" fill="#0D131A"/>
+    <circle cx="60" cy="52" r="22" fill="#161E27" stroke="#2DD4E8" stroke-width="2"/>
+    <!-- Play symbol -->
+    <polygon points="55,43 71,52 55,61" fill="#4ADE80"/>
+    <!-- Verified Badge -->
+    <rect x="8" y="102" width="104" height="18" rx="3" fill="#4ADE80"/>
+    <text x="60" y="114" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="9" font-weight="700" fill="#0B1015" text-anchor="middle">DECODE-VERIFIED</text>
+    <!-- Label -->
+    <text x="60" y="136" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="9" font-weight="700" fill="#F3F7F9" text-anchor="middle">FEATURE FILM</text>
+    <text x="60" y="150" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" fill="#A7B6C2" text-anchor="middle">48 frames proof</text>
+    <text x="60" y="164" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" font-weight="700" fill="#2DD4E8" text-anchor="middle">[ENTER] Play</text>
+  </g>
+
+  <!-- Card 4 -->
+  <g transform="translate(404, 54)">
+    <rect x="0" y="8" width="112" height="170" rx="5" fill="#161E27" stroke="#33424F"/>
+    <rect x="8" y="16" width="96" height="85" rx="3" fill="#0D131A"/>
+    <!-- Abstract art 4 -->
+    <polygon points="56,38 64,54 80,54 67,64 72,80 56,70 40,80 45,64 32,54 48,54" fill="#161E27" stroke="#FB7185" stroke-width="1.5"/>
+    <rect x="16" y="110" width="80" height="14" rx="2" fill="#1E2833"/>
+    <text x="56" y="121" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" fill="#A7B6C2" text-anchor="middle">CARTOON SHORT</text>
+    <rect x="20" y="132" width="72" height="14" rx="2" fill="#1E2833" stroke="#4ADE80"/>
+    <text x="56" y="142" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" font-weight="700" fill="#4ADE80" text-anchor="middle">DECODED</text>
+  </g>
+
+  <!-- Card 5 -->
+  <g transform="translate(528, 54)">
+    <rect x="0" y="8" width="112" height="170" rx="5" fill="#161E27" stroke="#33424F"/>
+    <rect x="8" y="16" width="96" height="85" rx="3" fill="#0D131A"/>
+    <!-- Abstract art 5 -->
+    <rect x="28" y="38" width="56" height="42" rx="2" fill="#161E27" stroke="#2DD4E8" stroke-width="1.5"/>
+    <circle cx="36" cy="48" r="2" fill="#4ADE80"/>
+    <circle cx="36" cy="59" r="2" fill="#4ADE80"/>
+    <line x1="44" y1="48" x2="74" y2="48" stroke="#2DD4E8" stroke-width="1.5"/>
+    <line x1="44" y1="59" x2="74" y2="59" stroke="#2DD4E8" stroke-width="1.5"/>
+    <rect x="16" y="110" width="80" height="14" rx="2" fill="#1E2833"/>
+    <text x="56" y="121" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" fill="#A7B6C2" text-anchor="middle">LOCAL NAS SHARE</text>
+    <rect x="20" y="132" width="72" height="14" rx="2" fill="#1E2833" stroke="#4ADE80"/>
+    <text x="56" y="142" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="8" font-weight="700" fill="#4ADE80" text-anchor="middle">PRESENT</text>
+  </g>
+
+  <!-- Bottom Player Details Strip -->
+  <g transform="translate(28, 242)">
+    <rect x="0" y="0" width="616" height="82" rx="5" fill="#161E27" stroke="#33424F"/>
+    <text x="16" y="24" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="11" font-weight="700" fill="#4ADE80">DECODE PROOF: 48/48 FRAMES VERIFIED IN LIBMPV BEFORE PLAY</text>
+    <text x="16" y="44" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#F3F7F9">Source: archive.org public domain stream</text>
+    <text x="16" y="64" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#A7B6C2">No dead buttons: the grower discovers, maps and verifies in the background</text>
+  </g>
+</g>
+</svg>
