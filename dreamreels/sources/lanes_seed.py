@@ -1,5 +1,5 @@
 """Channel 83 + Toon Town lanes: pre-mapped seed manifests (archive.org item + file per episode/short,
-TMDB metadata) exported from the Blueboxd mappers. Installing a lane upserts shows + items and queues a
+TMDB metadata) exported from the earlier archive.org mappers. Installing a lane upserts shows + items and queues a
 DECODE verify for every file — nothing is marked playable on the strength of the manifest alone."""
 from __future__ import annotations
 import json, time
@@ -75,7 +75,7 @@ def install_chan83(c=None) -> dict:
                      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)
                      ON CONFLICT(uid) DO UPDATE SET stream_url=excluded.stream_url,ia_id=excluded.ia_id,ia_file=excluded.ia_file,poster=COALESCE(items.poster,excluded.poster),blurb=COALESCE(items.blurb,excluded.blurb)""",
                   (uid, "chan83", "episode", e["ep_id"], title, e.get("title"), y, e.get("tmdb_ep_id"), "tv_episode", f"chan83:{e['show_id']}", disp_season, e["episode"], e.get("overview"), era, (e.get("runtime_sec") or 0) // 60 or None, "Anthology", (y // 10 * 10) if y else None,
-                   _poster(e.get("still_path")), url, e["ia_id"], e["stream_name"], 1 if era == "original" else 0, "seeded from Blueboxd map; awaiting decode", now)); n_ep += 1
+                   _poster(e.get("still_path")), url, e["ia_id"], e["stream_name"], 1 if era == "original" else 0, "seeded from archive.org map; awaiting decode", now)); n_ep += 1
         _enqueue_verify(c, uid)
     c.commit(); prune_chan83_era(c)
     if own: c.close()
@@ -93,7 +93,7 @@ def install_toontown(c=None) -> dict:
                      VALUES(?,?,?,?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?,?,1,0,?,?)
                      ON CONFLICT(uid) DO UPDATE SET stream_url=excluded.stream_url,ia_id=excluded.ia_id,ia_file=excluded.ia_file,blurb=COALESCE(items.blurb,excluded.blurb)""",
                   (uid, "toontown", "short", e["short_id"], e.get("title") or e["short_id"], e.get("title"), y, e.get("tmdb_id"), f"toontown:{e['series_id']}", e.get("order_no") or 0, e.get("overview"), e.get("studio"), max(1, (e.get("runtime_sec") or 0) // 60) if e.get("runtime_sec") else None,
-                   "Animation" + (", Silent" if e.get("silent") else ""), (y // 10 * 10) if y else None, _poster(e.get("still_path")), url, e["ia_id"], e["stream_name"], "seeded from Blueboxd map; awaiting decode", now)); n_sh += 1
+                   "Animation" + (", Silent" if e.get("silent") else ""), (y // 10 * 10) if y else None, _poster(e.get("still_path")), url, e["ia_id"], e["stream_name"], "seeded from archive.org map; awaiting decode", now)); n_sh += 1
         _enqueue_verify(c, uid)
     c.commit()
     if own: c.close()
